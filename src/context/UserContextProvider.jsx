@@ -7,7 +7,7 @@ export default function UserContextProvider({ children }) {
 
   useEffect(() => {
     const initializeUserContext = async () => {
-        const { data: response } = await refreshUserToken()
+        const response = await refreshUserToken()
         console.log(response)
         if (!response?.success) return
   
