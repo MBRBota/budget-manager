@@ -1,6 +1,6 @@
-import { resourceApi } from "../utils/axios";
-import { APP_CONSTANTS } from "../utils/constants";
-import { refreshUserToken } from "./auth.service";
+import { resourceApi } from "../../utils/axios";
+import { APP_CONSTANTS } from "../../utils/constants";
+import { retryWithRefresh } from "./retryWithRefresh.service";
 
 export const getUserCategories = async (accessToken) => {
   const { data } = await resourceApi.get(
@@ -8,15 +8,10 @@ export const getUserCategories = async (accessToken) => {
     { headers: { "Authorization": `Bearer ${accessToken}` }}
   )
 
-  if (!data?.success) {
-    const refreshResponse = await refreshUserToken()
-    if (!refreshResponse?.success)
-      return { success: false }
-
-    const retryResponse = await getUserCategories(refreshResponse.data.accessToken)
-    retryResponse.data = { ...retryResponse.data, ...refreshResponse.data }
-    return retryResponse
-  }
+  // If request fails, try again after refreshing access token
+  // On success, return new access token along with data
+  if (!data?.success)
+    return await retryWithRefresh((newToken) => getUserCategories(newToken))
 
   return data
 }
@@ -27,15 +22,10 @@ export const getUserExpenses = async (accessToken) => {
     { headers: { "Authorization": `Bearer ${accessToken}` }}
   )
 
-  if (!data?.success) {
-    const refreshResponse = await refreshUserToken()
-    if (!refreshResponse?.success)
-      return { success: false }
-
-    const retryResponse = await getUserExpenses(refreshResponse.data.accessToken)
-    retryResponse.data = { ...retryResponse.data, ...refreshResponse.data }
-    return retryResponse
-  }
+  // If request fails, try again after refreshing access token
+  // On success, return new access token along with data
+  if (!data?.success)
+    return await retryWithRefresh((newToken) => getUserExpenses(newToken))
 
   return data
 }
@@ -47,11 +37,11 @@ export const getUserResources = async (accessToken) => {
   if (!categoriesResponse?.success || !expensesResponse?.success)
     return { success: false }
 
-  const unifiedResponses = {
+  const unifiedResponse = {
     success: true,
     message: "User resources retrieved successfully.",
     data: { ...categoriesResponse.data, ...expensesResponse.data }
   }
   
-  return unifiedResponses
+  return unifiedResponse
 }
