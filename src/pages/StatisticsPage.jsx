@@ -1,7 +1,10 @@
+import Statistics from "../components/budget/Statistics";
+
+
 export default function StatisticsPage() {
   return (
     <>
-      <h1>Statistics</h1>
+      <Statistics />
     </>
   )
 }
