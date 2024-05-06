@@ -8,7 +8,10 @@ export const retryWithRefresh = async (retryCallback) => {
   // Try previously attempted request again with a fresh access token
   // Include fresh token in requested data object
   const retryResponse = await retryCallback(refreshResponse.data.accessToken)
-  retryResponse.data = { ...retryResponse.data, ...refreshResponse.data }
+  retryResponse.data = {
+    ...retryResponse.data,
+    user: { ...refreshResponse.data }
+  }
 
   return retryResponse
 }
