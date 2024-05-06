@@ -1,10 +1,11 @@
 import { useState } from "react"
 import { registerUser } from "../../services/auth.service"
-import { Link, Navigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 
 export default function RegisterForm() {
   const [userCredentials, setUserCredentials] = useState({ username: "", password: "" })
+  const navigate = useNavigate()
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -16,12 +17,16 @@ export default function RegisterForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
-    // todo: Implement username, password string verifications
-    const response = await registerUser(userCredentials)
-
-    if (response.success)
-      return <Navigate to='/login' replace />
+    try{
+      // todo: Implement username, password string verifications
+      const response = await registerUser(userCredentials)
+  
+      if (response.success)
+        navigate('/login', { replace: true })
+    } catch (err) {
+      // todo: Implement error notification, input field highlighting
+      console.log(err)
+    }
   }
 
   return (

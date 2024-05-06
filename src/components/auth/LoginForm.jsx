@@ -1,12 +1,13 @@
 import { useContext, useState } from "react"
 import { loginUser } from "../../services/auth.service"
-import { Link, Navigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { UserContext } from "../../context/UserContext"
 
 
 export default function LoginForm() {
   const [userCredentials, setUserCredentials] = useState({ username: "", password: "" })
   const { setUser } = useContext(UserContext)
+  const navigate = useNavigate()
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -19,14 +20,17 @@ export default function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    const response = await loginUser(userCredentials);
+    try{
+      const response = await loginUser(userCredentials);
 
-    // todo: Implement error notification instead of redirection on login fail
-    if (!response.success)
-      return <Navigate to="/register" replace />
+      if (response.success)
+        setUser(response.data)
+    } catch (err) {
 
-    setUser(response.data)
-    return <Navigate to="/statistics" replace />
+      // todo: Implement error notification instead of redirection on login fail
+      console.log(err)
+      navigate('/register', { replace: true })
+    }
   }
 
   return (
