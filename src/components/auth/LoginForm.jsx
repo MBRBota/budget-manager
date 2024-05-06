@@ -20,6 +20,8 @@ export default function LoginForm() {
     e.preventDefault()
     
     const response = await loginUser(userCredentials);
+
+    // todo: Implement error notification instead of redirection on login fail
     if (!response.success)
       return <Navigate to="/register" replace />
 

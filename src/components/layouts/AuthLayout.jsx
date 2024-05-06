@@ -5,6 +5,7 @@ import { UserContext } from "../../context/UserContext";
 export default function AuthLayout() {
   const userContext = useContext(UserContext)
 
+  // Redirect to budget (protected) routes if user is already logged in
   if (userContext.user)
     return <Navigate to="/statistics" replace/>
 

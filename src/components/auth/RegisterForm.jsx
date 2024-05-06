@@ -17,6 +17,7 @@ export default function RegisterForm() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     
+    // todo: Implement username, password string verifications
     const response = await registerUser(userCredentials)
 
     if (response.success)
