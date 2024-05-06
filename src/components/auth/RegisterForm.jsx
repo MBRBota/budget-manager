@@ -8,10 +8,10 @@ export default function RegisterForm() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setUserCredentials({
-      ...userCredentials,
+    setUserCredentials(prevUserCredentials => ({
+      ...prevUserCredentials,
       [name]: value
-    })
+    }))
   }
 
   const handleSubmit = async (e) => {
