@@ -1,9 +1,10 @@
 import { useContext, useState, useEffect } from "react"
 import { UserContext } from "../../context/UserContext"
 import { getUserResources } from "../../services/resource/getResource.service"
+import { Chart as ChartJS } from 'chart.js/auto'
+import 'chartjs-adapter-dayjs-4/dist/chartjs-adapter-dayjs-4.esm'
 import LineChart from "./statistics/LineChart"
 import PieChart from "./statistics/PieChart"
-import dayjs from "dayjs"
 
 export default function Statistics() {
   const { user, setUser } = useContext(UserContext)
@@ -21,24 +22,21 @@ export default function Statistics() {
       if (response.data?.user)
         setUser(response.data.user)
 
-      response.data.userCategories = convertUnixToDate(response.data.userCategories)
-
       setUserResources(response.data)
       setIsLoaded(true)
-      console.log(userResources)
+      console.log(response.data)
     }
     fetchResources()
   }, [])
 
-  // Convert all UNIX expense timestamps to Day.js objects
-  function convertUnixToDate (expenses) {
-    return expenses.map(expense => expense.expenseDate = dayjs(expense.expenseDate))
+  function convertExpensesToLinearDataset (expenses) {
+    return expenses.map(expense => ({ x: Number(expense.expenseDate), y: Number(expense.expenseSum) }))
   }
 
   return isLoaded && (
     <div className="statistics__container">
       <section className="line-chart__container">
-        <LineChart userCategories={userResources.userCategories}/>
+        <LineChart userExpenses={convertExpensesToLinearDataset(userResources.userExpenses)}/>
       </section>
       <section className="pie-chart__container">
         <PieChart />
