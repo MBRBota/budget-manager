@@ -1,7 +1,7 @@
 import dayjs from "dayjs"
 import { useState } from "react"
 import { Line } from "react-chartjs-2"
-import { mapExpensesByTimeUnit } from "../../../services/resource/mapExpensesByTimeUnit"
+import { mapExpenseTotalsLinearly } from "../../../services/resource/expenseMappers.service"
 
 
 
@@ -12,7 +12,7 @@ export default function LineChart({ userExpenses }) {
     datasets: [
       {
         label: "Total Expenses",
-        data: mapExpensesByTimeUnit(userExpenses, dayjs(), timeUnit),
+        data: mapExpenseTotalsLinearly(userExpenses, dayjs(), timeUnit),
         borderColor: "#0c9bed",
         backgroundColor: "#0c9bed99"
       }
