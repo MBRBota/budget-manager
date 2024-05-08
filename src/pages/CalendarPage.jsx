@@ -1,8 +1,10 @@
+import Calendar from "../components/budget/Calendar"
+
 export default function CalendarPage() {
 
   return (
     <>
-      <h1>Calendar</h1>
+      <Calendar />
     </>
   )
 }
