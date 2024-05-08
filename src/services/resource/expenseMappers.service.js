@@ -102,7 +102,7 @@ export const mapExpenseTotalsByCategory = (userExpenses, date, timeUnit) => {
   const categoryTotals = []
   const categoryColors = []
 
-  const filterByRange = userExpenses.filter(({ expenseDate }) => dayjs(expenseDate).isBetween(startOfRange, endOfRange))
+  const filterByRange = userExpenses.filter(({ expenseDate }) => dayjs(Number(expenseDate)).isBetween(startOfRange, endOfRange))
   
   // Get unique expense categories
   const categoryLabels = [...new Set(filterByRange.map(({ categoryName }) => categoryName))]
@@ -112,7 +112,7 @@ export const mapExpenseTotalsByCategory = (userExpenses, date, timeUnit) => {
     const filterByCategory = userExpenses.filter(({ categoryName }) => categoryName === label)
 
     const sumExpenses = filterByCategory.reduce((accumulator, currentExpense) => ({
-      sum: accumulator.sum + currentExpense.expenseSum,
+      sum: accumulator.sum + Number(currentExpense.expenseSum),
       color: currentExpense.categoryColor
     }),
     {
@@ -122,7 +122,7 @@ export const mapExpenseTotalsByCategory = (userExpenses, date, timeUnit) => {
   )
 
     categoryTotals.push(sumExpenses.sum)
-    categoryColors.push(sumExpenses.color)
+    categoryColors.push("#" + sumExpenses.color)
   }
 
   return [categoryLabels, categoryColors, categoryTotals]
