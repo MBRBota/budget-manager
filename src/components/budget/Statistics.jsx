@@ -24,7 +24,6 @@ export default function Statistics() {
 
       setUserResources(response.data)
       setIsLoaded(true)
-      console.log(response.data)
     }
     fetchResources()
   }, [])
@@ -39,7 +38,7 @@ export default function Statistics() {
         <LineChart userExpenses={convertExpensesToLinearDataset(userResources.userExpenses)}/>
       </section>
       <section className="pie-chart__container">
-        <PieChart />
+        <PieChart userExpenses={userResources.userExpenses}/>
       </section>
     </div>
   )
