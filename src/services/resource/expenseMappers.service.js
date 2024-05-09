@@ -103,7 +103,7 @@ export const mapExpenseTotalsLinearly = (options) => {
 
       return convertedDate.isSame(comparisonDate, comparisonUnit)
     })
-    
+
     const sumExpenses = filterByRange.reduce((accumulator, currentExpense) => ({
       ...currentExpense,
       [constantProperty]: accumulator[constantProperty],
@@ -115,6 +115,8 @@ export const mapExpenseTotalsLinearly = (options) => {
       [constantProperty]: getDefaultOfUnit(date, timeUnit, i),
       [sumProperty]: 0
     })
+    
+    sumExpenses.baseExpenses = filterByRange
 
     mappedExpenses.push(sumExpenses)
   }
