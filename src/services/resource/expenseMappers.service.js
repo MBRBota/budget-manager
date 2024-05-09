@@ -8,19 +8,32 @@ dayjs.extend(isBetween)
 dayjs.extend(quarterOfYear)
 dayjs.extend(weekOfYear)
 
+const getTimeSubUnit = (timeUnit) => {
+  switch (timeUnit) {
+    case 'week':
+      return 'day'
+    case 'month':
+      return 'day'
+    case 'quarter':
+      return 'week'
+    case 'year':
+      return 'month'
+  }
+}
+
 // Take a date and the type of timescale it will be displayed on
 // Return the timescale relative value
-const getTimeUnit = (date, timeUnit) => {
+const getComparisonDate = (date, timeUnit, timeValue) => {
     switch (timeUnit) {
       case 'week':
-        return date.day()
+        return date.day(timeValue)
       case 'month':
         // Days in month, unlike other units, are 1 indexed
-        return date.date() - 1
+        return date.date(timeValue + 1)
       case 'quarter':
-        return date.week()
+        return date.week(timeValue)
       case 'year':
-        return date.month()
+        return date.month(timeValue)
     }
 }
 
@@ -64,7 +77,6 @@ const getDefaultOfUnit = (date, timeUnit, timeValue) => {
 // Returns an array of expenses within the provided date's time unit
 export const mapExpenseTotalsLinearly = (userExpenses, date, timeUnit) => {
   const startOfRange = date.startOf(timeUnit)
-  const endOfRange = date.endOf(timeUnit)
 
   // Initialize loop iterator with first week of quarter, otherwise 0
   const startOfUnit = timeUnit === "quarter" ? startOfRange.week() : 0
@@ -72,11 +84,13 @@ export const mapExpenseTotalsLinearly = (userExpenses, date, timeUnit) => {
   
   const mappedExpenses = []
 
+  // For every day/week/month (range dependent) filter expenses to match said unit, and add together filtered expense sums
   for (let i = startOfUnit; i <= endOfUnit; i++) {
     const filterByRange = userExpenses.filter(({ x }) => {
       const convertedDate = dayjs(x)
+      const comparisonUnit = getTimeSubUnit(timeUnit)
 
-      return convertedDate.isBetween(startOfRange, endOfRange) && getTimeUnit(convertedDate, timeUnit) === i
+      return convertedDate.isSame(getComparisonDate(date, timeUnit, i), comparisonUnit)
     })
     
     const sumExpenses = filterByRange.reduce((accumulator, currentExpense) => ({
@@ -91,7 +105,6 @@ export const mapExpenseTotalsLinearly = (userExpenses, date, timeUnit) => {
 
     mappedExpenses.push(sumExpenses)
   }
-
   return mappedExpenses
 }
 
