@@ -1,3 +1,5 @@
+import { mapExpenseTotalsLinearly } from "../resource/expenseMappers.service"
+
 export const getYearOptions = () => {
   const yearOptions = []
 
@@ -24,16 +26,10 @@ export const getMonthOptions = () => {
   return monthOptions
 }
 
-export const getMonthItems = (date) => {
-  const daysInMonth = date.daysInMonth()
-  const monthItems = []
+export const getMonthItems = (options, userCategories) => {
+  const mappedExpenses = mapExpenseTotalsLinearly(options)
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    // WIP
-    const dayItem = <li key={day}>{day}</li>
-
-    monthItems.push(dayItem)
-  }
-
-  return monthItems
+  return mappedExpenses.map((expense, idx) => (
+    <li key={idx}>{`${idx+1} - ${expense.expenseSum}`}</li>
+  ))
 }
