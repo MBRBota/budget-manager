@@ -4,6 +4,7 @@ import { refreshUserToken } from "../services/auth.service";
 
 export default function UserContextProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false)
 
   // Initialize user state using refresh token (if applicable) on first render
   useEffect(() => {
@@ -16,6 +17,7 @@ export default function UserContextProvider({ children }) {
           return
   
         setUser(response.data)
+        setIsLoaded(true)
       } catch (err) {
         console.log(err)
       }
@@ -24,7 +26,7 @@ export default function UserContextProvider({ children }) {
   }, [])
 
   const contextValue = { user, setUser }
-  return (
+  return isLoaded && (
     <UserContext.Provider value={contextValue}>
       {children}
     </UserContext.Provider>
