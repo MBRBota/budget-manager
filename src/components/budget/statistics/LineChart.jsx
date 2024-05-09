@@ -14,11 +14,23 @@ export default function LineChart({ userExpenses }) {
     setTimeUnit(value)
   }
 
+  console.log(userExpenses)
+
+  const expenseMapOptions = {
+    userExpenses,
+    date: dayjs(),
+    timeUnit,
+    requiredSubUnit: true,
+    constant: {},
+    constantProperty: 'x',
+    sumProperty: 'y'
+  }
+
   const data = {
     datasets: [
       {
         label: "Total Expenses",
-        data: mapExpenseTotalsLinearly(userExpenses, dayjs(), timeUnit),
+        data: mapExpenseTotalsLinearly(expenseMapOptions),
         borderColor: "#0c9bed",
         backgroundColor: "#0c9bed99"
       }

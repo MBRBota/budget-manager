@@ -75,7 +75,17 @@ const getDefaultOfUnit = (date, timeUnit, timeValue) => {
   return unitDefault.startOf('day').valueOf()
 }
 // Returns an array of expenses within the provided date's time unit
-export const mapExpenseTotalsLinearly = (userExpenses, date, timeUnit) => {
+export const mapExpenseTotalsLinearly = (options) => {
+  const {
+    userExpenses,
+    date,
+    timeUnit,
+    requiredSubUnit,
+    constant,
+    constantProperty,
+    sumProperty 
+  } = options
+
   const startOfRange = date.startOf(timeUnit)
 
   // Initialize loop iterator with first week of quarter, otherwise 0
@@ -84,23 +94,27 @@ export const mapExpenseTotalsLinearly = (userExpenses, date, timeUnit) => {
   
   const mappedExpenses = []
 
-  // For every day/week/month (range dependent) filter expenses to match said unit, and add together filtered expense sums
+  // For every day/week/month (range dependent) filter expenses to match said unit,
+  // and add together filtered expense sums
   for (let i = startOfUnit; i <= endOfUnit; i++) {
-    const filterByRange = userExpenses.filter(({ x }) => {
-      const convertedDate = dayjs(x)
-      const comparisonUnit = getTimeSubUnit(timeUnit)
+    const filterByRange = userExpenses.filter(({ expenseDate }) => {
+      const convertedDate = dayjs(Number(expenseDate))
+      const comparisonUnit = requiredSubUnit ? getTimeSubUnit(timeUnit) : timeUnit
+      const comparisonDate = getComparisonDate(date, timeUnit, i)
 
-      return convertedDate.isSame(getComparisonDate(date, timeUnit, i), comparisonUnit)
+      return convertedDate.isSame(comparisonDate, comparisonUnit)
     })
     
     const sumExpenses = filterByRange.reduce((accumulator, currentExpense) => ({
-      x: accumulator.x,
-      y: accumulator.y + currentExpense.y
+      ...currentExpense,
+      [constantProperty]: accumulator[constantProperty],
+      [sumProperty]: accumulator[sumProperty] + Number(currentExpense.expenseSum)
     }),
     // Initial value in case of empty array
     {
-      x: getDefaultOfUnit(date, timeUnit, i),
-      y: 0
+      ...constant,
+      [constantProperty]: getDefaultOfUnit(date, timeUnit, i),
+      [sumProperty]: 0
     })
 
     mappedExpenses.push(sumExpenses)

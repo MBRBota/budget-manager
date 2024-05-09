@@ -28,14 +28,10 @@ export default function Statistics() {
     fetchResources()
   }, [])
 
-  function convertExpensesToLinearDataset (expenses) {
-    return expenses.map(expense => ({ x: Number(expense.expenseDate), y: Number(expense.expenseSum) }))
-  }
-
   return isLoaded && (
     <div className="statistics__container">
       <section className="line-chart__container">
-        <LineChart userExpenses={convertExpensesToLinearDataset(userResources.userExpenses)}/>
+        <LineChart userExpenses={userResources.userExpenses}/>
       </section>
       <section className="pie-chart__container">
         <PieChart userExpenses={userResources.userExpenses}/>
