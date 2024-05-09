@@ -94,7 +94,7 @@ export const mapExpenseTotalsLinearly = (userExpenses, date, timeUnit) => {
     })
     
     const sumExpenses = filterByRange.reduce((accumulator, currentExpense) => ({
-      x: currentExpense.x,
+      x: accumulator.x,
       y: accumulator.y + currentExpense.y
     }),
     // Initial value in case of empty array
