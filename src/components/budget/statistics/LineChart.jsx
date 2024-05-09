@@ -14,13 +14,10 @@ export default function LineChart({ userExpenses }) {
     setTimeUnit(value)
   }
 
-  console.log(userExpenses)
-
   const expenseMapOptions = {
     userExpenses,
     date: dayjs(),
     timeUnit,
-    requiredSubUnit: true,
     constant: {},
     constantProperty: 'x',
     sumProperty: 'y'

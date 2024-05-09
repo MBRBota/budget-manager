@@ -80,7 +80,6 @@ export const mapExpenseTotalsLinearly = (options) => {
     userExpenses,
     date,
     timeUnit,
-    requiredSubUnit,
     constant,
     constantProperty,
     sumProperty 
@@ -99,7 +98,7 @@ export const mapExpenseTotalsLinearly = (options) => {
   for (let i = startOfUnit; i <= endOfUnit; i++) {
     const filterByRange = userExpenses.filter(({ expenseDate }) => {
       const convertedDate = dayjs(Number(expenseDate))
-      const comparisonUnit = requiredSubUnit ? getTimeSubUnit(timeUnit) : timeUnit
+      const comparisonUnit = getTimeSubUnit(timeUnit)
       const comparisonDate = getComparisonDate(date, timeUnit, i)
 
       return convertedDate.isSame(comparisonDate, comparisonUnit)

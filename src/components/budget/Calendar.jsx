@@ -16,7 +16,24 @@ export default function Calendar() {
 
   const memoizedYearOptions = useMemo(() => getYearOptions(), [])
   const memoizedMonthOptions = useMemo(() => getMonthOptions(), [])
-  const memoizedMonthItems = useMemo(() => getMonthItems(date), [date])
+  
+  const expenseMapOptions = {
+    userExpenses: userResources.userExpenses,
+    date: date,
+    timeUnit: 'month',
+    constant: {
+      categoryColor: null,
+      categoryId: null,
+      categoryName: null,
+      expenseDate: null,
+      expenseId: null,
+      expenseSum: 0
+    },
+    constantProperty: 'expenseDate',
+    sumProperty: 'expenseSum'
+  }
+  
+  const monthItems = getMonthItems(expenseMapOptions, userResources.userCategories)
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -45,17 +62,18 @@ export default function Calendar() {
   }
 
   return isLoaded && (
-    <>
-      <h1>Calendar</h1>
-      <select name="year" value={dateOptions.year} onChange={handleDateChange}>
-        {memoizedYearOptions}
-      </select>
-      <select name="month" value={dateOptions.month} onChange={handleDateChange}>
-        {memoizedMonthOptions}
-      </select>
-      <ul>
-        {memoizedMonthItems}
+    <div className="calendar__container">
+      <div className="calendar-options__container">
+        <select name="year" value={dateOptions.year} onChange={handleDateChange}>
+          {memoizedYearOptions}
+        </select>
+        <select name="month" value={dateOptions.month} onChange={handleDateChange}>
+          {memoizedMonthOptions}
+        </select>
+      </div>
+      <ul className="calendar-items__container">
+        {monthItems}
       </ul>
-    </>
+    </div>
   )
 }
