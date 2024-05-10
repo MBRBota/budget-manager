@@ -21,6 +21,7 @@ export default function Calendar() {
     userExpenses: userResources.userExpenses,
     date: date,
     timeUnit: 'month',
+    requireSubUnit: true,
     constant: {
       categoryColor: null,
       categoryId: null,

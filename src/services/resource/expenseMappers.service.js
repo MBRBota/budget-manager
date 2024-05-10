@@ -74,12 +74,24 @@ const getDefaultOfUnit = (date, timeUnit, timeValue) => {
 
   return unitDefault.startOf('day').valueOf()
 }
+
+const getFilteredByRangeExpenses = (userExpenses, date, timeUnit, timeValue, requireSubUnit) => {
+  return userExpenses.filter(({ expenseDate }) => {
+    const convertedDate = dayjs(Number(expenseDate))
+    const comparisonUnit = requireSubUnit ? getTimeSubUnit(timeUnit) : timeUnit
+    const comparisonDate = getComparisonDate(date, timeUnit, timeValue)
+
+    return convertedDate.isSame(comparisonDate, comparisonUnit)
+  })
+}
+
 // Returns an array of expenses within the provided date's time unit
 export const mapExpenseTotalsLinearly = (options) => {
   const {
     userExpenses,
     date,
     timeUnit,
+    requireSubUnit,
     constant,
     constantProperty,
     sumProperty 
@@ -96,13 +108,7 @@ export const mapExpenseTotalsLinearly = (options) => {
   // For every day/week/month (range dependent) filter expenses to match said unit,
   // and add together filtered expense sums
   for (let i = startOfUnit; i <= endOfUnit; i++) {
-    const filterByRange = userExpenses.filter(({ expenseDate }) => {
-      const convertedDate = dayjs(Number(expenseDate))
-      const comparisonUnit = getTimeSubUnit(timeUnit)
-      const comparisonDate = getComparisonDate(date, timeUnit, i)
-
-      return convertedDate.isSame(comparisonDate, comparisonUnit)
-    })
+    const filterByRange = getFilteredByRangeExpenses(userExpenses, date, timeUnit, i, requireSubUnit)
 
     const sumExpenses = filterByRange.reduce((accumulator, currentExpense) => ({
       ...currentExpense,
@@ -124,13 +130,10 @@ export const mapExpenseTotalsLinearly = (options) => {
 }
 
 export const mapExpenseTotalsByCategory = (userExpenses, date, timeUnit) => {
-  const startOfRange = date.startOf(timeUnit)
-  const endOfRange = date.endOf(timeUnit)
-
   const categoryTotals = []
   const categoryColors = []
 
-  const filterByRange = userExpenses.filter(({ expenseDate }) => dayjs(Number(expenseDate)).isBetween(startOfRange, endOfRange))
+  const filterByRange = userExpenses.filter(({ expenseDate }) => dayjs(Number(expenseDate)).isSame(date, timeUnit))
   
   // Get unique expense categories
   const categoryLabels = [...new Set(filterByRange.map(({ categoryName }) => categoryName))]
