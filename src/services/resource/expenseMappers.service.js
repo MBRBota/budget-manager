@@ -121,7 +121,7 @@ export const mapExpenseTotalsLinearly = (options) => {
       [constantProperty]: getDefaultOfUnit(date, timeUnit, i),
       [sumProperty]: 0
     })
-    
+
     sumExpenses.baseExpenses = filterByRange
 
     mappedExpenses.push(sumExpenses)
@@ -140,7 +140,7 @@ export const mapExpenseTotalsByCategory = (userExpenses, date, timeUnit) => {
 
   // Ensure each label has a value and color at a similar position in their respective arrays
   for (const label of categoryLabels) {
-    const filterByCategory = userExpenses.filter(({ categoryName }) => categoryName === label)
+    const filterByCategory = filterByRange.filter(({ categoryName }) => categoryName === label)
 
     const sumExpenses = filterByCategory.reduce((accumulator, currentExpense) => ({
       sum: accumulator.sum + Number(currentExpense.expenseSum),
