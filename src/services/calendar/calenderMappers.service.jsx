@@ -1,3 +1,4 @@
+import CalendarItem from "../../components/budget/calendar/CalendarItem"
 import { mapExpenseTotalsLinearly } from "../resource/expenseMappers.service"
 
 export const getYearOptions = () => {
@@ -26,10 +27,12 @@ export const getMonthOptions = () => {
   return monthOptions
 }
 
-export const getMonthItems = (options, userCategories) => {
+export const getMonthItems = (options, openModal) => {
   const mappedExpenses = mapExpenseTotalsLinearly(options)
 
   return mappedExpenses.map((expense, idx) => (
-    <li key={idx}>{`${idx+1} - ${expense.expenseSum}`}</li>
+    <li key={idx} className="calendar-item__container">
+      <CalendarItem day={idx+1} expenses={expense} openModal={openModal}/>
+    </li>
   ))
 }
