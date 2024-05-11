@@ -19,7 +19,6 @@ export default function LineChart({ userExpenses }) {
     date: dayjs(),
     timeUnit,
     requireSubUnit: true,
-    constant: {},
     constantProperty: 'x',
     sumProperty: 'y'
   }

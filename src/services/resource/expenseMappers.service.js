@@ -92,7 +92,6 @@ export const mapExpenseTotalsLinearly = (options) => {
     date,
     timeUnit,
     requireSubUnit,
-    constant,
     constantProperty,
     sumProperty 
   } = options
@@ -111,13 +110,11 @@ export const mapExpenseTotalsLinearly = (options) => {
     const filterByRange = getFilteredByRangeExpenses(userExpenses, date, timeUnit, i, requireSubUnit)
 
     const sumExpenses = filterByRange.reduce((accumulator, currentExpense) => ({
-      ...currentExpense,
       [constantProperty]: accumulator[constantProperty],
       [sumProperty]: accumulator[sumProperty] + Number(currentExpense.expenseSum)
     }),
     // Initial value in case of empty array
     {
-      ...constant,
       [constantProperty]: getDefaultOfUnit(date, timeUnit, i),
       [sumProperty]: 0
     })
