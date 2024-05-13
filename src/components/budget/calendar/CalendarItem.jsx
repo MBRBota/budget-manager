@@ -5,7 +5,7 @@ export default function CalendarItem({ day, expenses, openModal }) {
 
 
   return (
-    <button className="calendar-item" onClick={() => openModal({ expenses })}>
+    <button className="calendar-item" onClick={() => openModal(expenses)}>
       <h2 className="calendar-item__day">{day}</h2>
       {
         expenses.total > 0 && (
