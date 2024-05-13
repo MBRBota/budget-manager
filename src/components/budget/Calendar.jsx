@@ -68,6 +68,9 @@ export default function Calendar() {
   }
   
   const monthItems = getMonthItems(expenseMapOptions, openModal)
+
+  // Set modal app element to root for screenreader accessibility
+  Modal.setAppElement('#root')
   
   return isLoaded && (
     <>
