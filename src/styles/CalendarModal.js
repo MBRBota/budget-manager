@@ -5,6 +5,7 @@ export const style = {
   content: {
     left: '30%',
     right: '30%',
+    minWidth: '720px',
     padding: '0',
     backgroundColor: '#242424'
   }

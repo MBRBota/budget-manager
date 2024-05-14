@@ -57,9 +57,98 @@
   .modal-expense__container {
     margin-top: 2rem;
     list-style: none;
+
+    .modal-expense i {
+      font-size: 1rem;
+      margin-right: 1rem;
+      vertical-align: middle;
+    }
   }
 
   .modal-expense__add {
     margin-top: 1rem;
+  }
+
+  .expense-form {
+    display: flex;
+    margin: 3rem 0;
+
+    .expense-form__submit {
+      margin-left: 2rem;
+    }
+  }
+
+  .modal-category__container {
+
+    .category-default__container, .category-custom__container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+      list-style: none;
+      padding: 0;
+
+      .category__wrapper {
+        min-width: 8rem;
+
+        .category {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          padding: 10px;
+
+          i {
+            font-size: 1rem;
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+
+    .category-custom__container {
+
+      .category-form {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+
+        .category-form__name {
+          width: 19rem;
+        }
+
+        label {
+          display: flex;
+          align-items: center;
+          height: 100%;
+        }
+
+        .category-form__color {
+          width: 9rem;
+          margin-left: 0.5rem;
+        }
+
+        button {
+          padding: 0;
+          background: none;
+          transition: color 0.25s;
+          border: none;
+        }
+
+        button:focus {
+          border: none;
+          outline: none;
+        }
+
+        .category-form__submit:hover {
+          color: #7272db;
+        }
+
+        .category-form__cancel:hover {
+          color: #ad2d2d;
+        }
+      }
+    }
   }
 }
