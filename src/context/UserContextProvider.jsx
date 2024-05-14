@@ -20,6 +20,7 @@ export default function UserContextProvider({ children }) {
         setIsLoaded(true)
       } catch (err) {
         console.log(err)
+        setIsLoaded(true)
       }
       }
     initializeUserContext()
