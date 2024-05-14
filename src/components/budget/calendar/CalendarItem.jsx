@@ -6,14 +6,19 @@ export default function CalendarItem({ day, expenses, openModal }) {
 
   return (
     <button className="calendar-item" onClick={() => openModal(expenses)}>
-      <h2 className="calendar-item__day">{day}</h2>
+      <h3 className="calendar-item__day">{day}</h3>
       {
         expenses.total > 0 && (
           <>
-            <h4 className="calendar-item__total">{expenses.total}</h4>
-            <ul className="calendar-peek__container">
-              {baseExpensesPeek}
-            </ul>
+            <h2 className="calendar-item__total">{expenses.total} RON</h2>
+            {
+              baseExpensesPeek.length > 1 && (
+                <ul className="calendar-peek__container">
+                  {baseExpensesPeek}
+                  {expenses.baseExpenses.length > 3 && <li>...</li>}
+                </ul>
+              )
+            }
           </>
         )
       }

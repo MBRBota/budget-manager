@@ -58,13 +58,15 @@ export default function LineChart({ userExpenses }) {
 
   return (
     <>
-      <select value={timeUnit} onChange={handleUnitChange}>
+      <select className="chart-range__select" value={timeUnit} onChange={handleUnitChange}>
         <option value="week">This Week</option>
         <option value="month">This Month</option>
         <option value="quarter">This Quarter</option>
         <option value="year">This Year</option>
       </select>
-      <Line options={options} data={data} />
+      <div className="line-chart__wrapper">
+        <Line options={options} data={data} />
+      </div>
     </>
   )
 }

@@ -28,13 +28,15 @@ export default function PieChart({ userExpenses }) {
 
   return (
     <>
-      <select value={timeUnit} onChange={handleUnitChange}>
+      <select className="chart-range__select" value={timeUnit} onChange={handleUnitChange}>
         <option value="week">This Week</option>
         <option value="month">This Month</option>
         <option value="quarter">This Quarter</option>
         <option value="year">This Year</option>
       </select>
-      <Pie data={data} />
+      <div className="pie-chart__wrapper">
+        <Pie data={data} />
+      </div>
     </>
   )
 }

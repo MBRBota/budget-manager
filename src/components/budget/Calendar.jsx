@@ -5,7 +5,7 @@ import { UserContext } from "../../context/UserContext"
 import { getUserResources } from "../../services/resource/getResource.service"
 import Modal from "react-modal"
 import CalendarModal from "./calendar/CalendarModal"
-
+import { style } from "../../styles/CalendarModal"
 
 export default function Calendar() {
   const { user, setUser } = useContext(UserContext)
@@ -87,7 +87,7 @@ export default function Calendar() {
           {monthItems}
         </ul>
       </div>
-      <Modal isOpen={modalIsOpen} onRequestClose={closeModal}>
+      <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={style}>
         <CalendarModal closeModal={closeModal} expenses={modalContent} categories={userResources.userCategories}/>
       </Modal>
     </>

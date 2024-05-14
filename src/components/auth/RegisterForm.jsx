@@ -30,7 +30,7 @@ export default function RegisterForm() {
   }
 
   return (
-    <>
+    <div className="register-form__container">
       <form className="login-form" onSubmit={handleSubmit}>
         <h1>Register</h1>
         <input 
@@ -52,6 +52,6 @@ export default function RegisterForm() {
         <button type="submit" >Submit</button>
       </form>
       <p>Already have an account? <Link to="/login">Log in!</Link></p>
-    </>
+    </div>
   )
 }

@@ -14,7 +14,7 @@ export default function ProtectedLayout() {
   return (
     <>
       <Navbar />
-      <main>
+      <main className="content__container">
         <Outlet />
       </main>
     </>

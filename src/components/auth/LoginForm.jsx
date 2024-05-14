@@ -34,7 +34,7 @@ export default function LoginForm() {
   }
 
   return (
-    <>
+    <div className="login-form__container">
       <form className="login-form" onSubmit={handleSubmit}>
         <h1>Login</h1>
         <input 
@@ -56,6 +56,6 @@ export default function LoginForm() {
         <button type="submit">Submit</button>
       </form>
       <p>Don't have an account yet? <Link to="/register">Register!</Link></p>
-    </>
+    </div>
   )
 }

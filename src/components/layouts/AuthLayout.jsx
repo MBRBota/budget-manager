@@ -10,7 +10,7 @@ export default function AuthLayout() {
     return <Navigate to="/statistics" replace/>
 
   return (
-    <main>
+    <main className="content__container">
       <Outlet />
     </main>
   )

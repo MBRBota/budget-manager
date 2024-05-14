@@ -1,0 +1,26 @@
+.statistics__container {
+  display: flex;
+  flex-direction: column;
+
+  .line-chart__container, .pie-chart__container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .chart-range__select {
+    width: 10rem;
+  }
+
+  .line-chart__wrapper, .pie-chart__wrapper {
+    align-self: center;
+  }
+
+  .line-chart__wrapper {
+    width: 0.8 * 1280px;
+  }
+
+  .pie-chart__wrapper {
+    width: 0.4 * 1280px;
+  }
+}

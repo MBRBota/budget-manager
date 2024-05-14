@@ -1,0 +1,65 @@
+.calendar__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .calendar-items__container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2rem;
+    list-style: none;
+    padding: 0;
+    // 7 calendar items per row, taking into account 2rem gaps
+    max-width: 7 * 14rem + 6 * 2rem;
+
+    .calendar-item__container {
+      height: 20rem;
+      min-height: 23rem;
+      width: 14rem;
+      border-radius: 8px;
+
+      .calendar-item {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        font-size: 1.6rem;
+        padding: 0.5rem 0.8rem;
+
+        .calendar-item__day {
+          position: absolute;
+          top: 1rem;
+          width: 85%;
+          margin: 0;
+          text-align: right;
+        }
+
+        .calendar-peek__container {
+          position: absolute;
+          left: 0;
+          right: 0;
+          list-style: none;
+          padding: 0;
+        }
+      }
+    }
+  }
+}
+
+.calendar-modal__container {
+  font-size: 1.6rem;
+  padding: 2rem;
+
+  .modal-header {
+    border-bottom: 2px solid white;
+  }
+
+  .modal-expense__container {
+    margin-top: 2rem;
+    list-style: none;
+  }
+
+  .modal-expense__add {
+    margin-top: 1rem;
+  }
+}
