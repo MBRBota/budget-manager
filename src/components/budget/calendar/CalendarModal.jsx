@@ -44,7 +44,7 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
 
       setExpenseData(prevExpenseData => ({
         ...prevExpenseData,
-        baseExpenses: [...prevExpenseData.baseExpenses, response.data.newExpense ],
+        baseExpenses: [...prevExpenseData.baseExpenses, response.data.newExpense],
         total: prevExpenseData.total + Number(response.data.newExpense.expenseSum)
       }))
 
@@ -150,17 +150,8 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
                       isAddingCategory
                         ? (
                           <form className="category-form" onSubmit={handleCategorySubmit}>
-                            <input
-                              type="text"
-                              name="categoryName"
-                              className="category-form__name"
-                              value={newCategory.categoryName}
-                              maxLength="20"
-                              onChange={handleCategoryChange}
-                              placeholder="Enter category name"
-                              required
-                            />
                             <label htmlFor="#categoryColor">
+                              <i className="fa-solid fa-circle" style={{ color: '#' + newCategory.categoryColor }} />
                               #
                               <input
                                 type="text"
@@ -175,6 +166,16 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
                                 required
                               />
                             </label>
+                            <input
+                              type="text"
+                              name="categoryName"
+                              className="category-form__name"
+                              value={newCategory.categoryName}
+                              maxLength="20"
+                              onChange={handleCategoryChange}
+                              placeholder="Enter category name"
+                              required
+                            />
                             <button className="category-form__submit" type="submit"><i className="fa-solid fa-floppy-disk" /></button>
                             <button className="category-form__cancel" type="button" onClick={toggleAddingCategory}><i className="fa-solid fa-ban" /></button>
                           </form>
