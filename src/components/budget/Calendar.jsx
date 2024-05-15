@@ -11,6 +11,7 @@ export default function Calendar() {
   const { user, setUser } = useContext(UserContext)
   const [userResources, setUserResources] = useState({ userCategories: [], userExpenses: [] })
   const [isLoaded, setIsLoaded] = useState(false)
+  const [shouldRefresh, setShouldRefresh] = useState(false)
 
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const [modalContent, setModalContent] = useState(null)
@@ -21,7 +22,7 @@ export default function Calendar() {
 
   const memoizedYearOptions = useMemo(() => getYearOptions(), [])
   const memoizedMonthOptions = useMemo(() => getMonthOptions(), [])
-  
+
   
   useEffect(() => {
     const fetchResources = async () => {
@@ -38,7 +39,7 @@ export default function Calendar() {
       setIsLoaded(true)
     }
     fetchResources()
-  }, [])
+  }, [isLoaded])
   
   const handleDateChange = (e) => {
     const { name, value } = e.target
@@ -56,6 +57,11 @@ export default function Calendar() {
   
   const closeModal = () => {
     setModalIsOpen(false)
+
+    if (shouldRefresh){
+      setShouldRefresh(false)
+      setIsLoaded(false)
+    }
   }
   
   const expenseMapOptions = {
@@ -88,7 +94,13 @@ export default function Calendar() {
         </ul>
       </div>
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={style}>
-        <CalendarModal closeModal={closeModal} date={modalContent?.date} expenses={modalContent?.expenses} categories={userResources.userCategories}/>
+        <CalendarModal 
+          closeModal={closeModal}
+          setShouldRefresh={setShouldRefresh}
+          date={modalContent?.date}
+          expenses={modalContent?.expenses}
+          categories={userResources.userCategories}
+        />
       </Modal>
     </>
   )

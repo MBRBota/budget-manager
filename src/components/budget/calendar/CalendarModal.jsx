@@ -1,9 +1,13 @@
 import dayjs from "dayjs"
 import { useContext, useState } from "react"
 import { UserContext } from "../../../context/UserContext"
+import { postExpense } from "../../../services/resource/postResource.service"
 
-export default function CalendarModal({ closeModal, date, expenses, categories }) {
-  const userContext = useContext(UserContext)
+export default function CalendarModal({ closeModal, setShouldRefresh, date, expenses, categories }) {
+  const { user, setUser } = useContext(UserContext)
+
+  const [expenseData, setExpenseData] = useState(expenses)
+  const [categoryData, setCategoryData] = useState(categories)
 
   const [isAddingExpense, setIsAddingExpense] = useState(false)
   const [isAddingCategory, setIsAddingCategory] = useState(false)
@@ -33,9 +37,21 @@ export default function CalendarModal({ closeModal, date, expenses, categories }
     e.preventDefault()
 
     try {
+      const response = await postExpense(user.accessToken, newExpense)
 
+      if (!response?.success)
+        setUser(null)
+
+      setExpenseData(prevExpenseData => ({
+        ...prevExpenseData,
+        baseExpenses: [...prevExpenseData.baseExpenses, response.data.newExpense ],
+        total: prevExpenseData.total + Number(response.data.newExpense.expenseSum)
+      }))
+      
+      setShouldRefresh(true)
     } catch (err) {
-
+      console.log(err)
+      setUser(null)
     }
   }
 
@@ -50,7 +66,7 @@ export default function CalendarModal({ closeModal, date, expenses, categories }
   }
 
 
-  const baseExpenses = expenses.baseExpenses.map((expense, idx) => (
+  const baseExpenses = expenseData.baseExpenses.map((expense, idx) => (
     <li key={idx} className="modal-expense">
       <h3><i className="fa-solid fa-circle" style={{ color: '#' + expense.categoryColor }} />{Number(expense.expenseSum)} RON - {expense.categoryName}</h3>
     </li>
@@ -69,8 +85,8 @@ export default function CalendarModal({ closeModal, date, expenses, categories }
     </li>
   ))
 
-  const defaultCategories = categoryMapper(categories.filter(category => category.categoryId <= 8))
-  const customCategories = categoryMapper(categories.filter(category => category.categoryId > 8))
+  const defaultCategories = categoryMapper(categoryData.filter(category => category.categoryId <= 8))
+  const customCategories = categoryMapper(categoryData.filter(category => category.categoryId > 8))
 
 
 
@@ -78,14 +94,14 @@ export default function CalendarModal({ closeModal, date, expenses, categories }
   return (
     <div className="calendar-modal__container">
       <div className="modal-header">
-        <h3 className="header__date">{dayjs(expenses.date).format('D MMMM YYYY')}</h3>
-        <h1 className="header__total">Total spent: {expenses.total} RON</h1>
+        <h3 className="header__date">{date.format('D MMMM YYYY')}</h3>
+        <h1 className="header__total">Total spent: {expenseData.total} RON</h1>
       </div>
       {
         isAddingExpense
           ? (
             <>
-              <form className="expense-form">
+              <form className="expense-form" onSubmit={handleExpenseSubmit}>
                 <button type="button" onClick={toggleAddingExpense}><i className="fa-solid fa-square-caret-left" /></button>
                 <input
                   type="number"
@@ -123,7 +139,7 @@ export default function CalendarModal({ closeModal, date, expenses, categories }
                     {
                       isAddingCategory
                         ? (
-                          <form className="category-form">
+                          <form className="category-form" onSubmit={handleCategorySubmit}>
                             <input
                               type="text"
                               name="categoryName"
