@@ -1,4 +1,3 @@
-import dayjs from "dayjs"
 import { useContext, useState } from "react"
 import { UserContext } from "../../../context/UserContext"
 import { postCategory, postExpense } from "../../../services/resource/postResource.service"
@@ -14,6 +13,8 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
   const [newExpense, setNewExpense] = useState({ expenseSum: '', expenseDate: date.valueOf(), categoryId: 1 })
   const [newCategory, setNewCategory] = useState({ categoryName: "", categoryColor: "" })
 
+  const [hoveredElement, setHoveredElement] = useState(null)
+
 
   const handleExpenseChange = (e) => {
     const { name, value } = e.target
@@ -23,6 +24,15 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
   const handleCategoryChange = (e) => {
     const { name, value } = e.target
     setNewCategory(prevCategory => ({ ...prevCategory, [name]: value }))
+  }
+
+  const handleMouseEnter = (e) => {
+    const index = e.currentTarget.dataset.index
+    setHoveredElement(index)
+  }
+
+  const handleMouseLeave = () => {
+    setHoveredElement(null)
   }
 
   const toggleAddingExpense = () => {
@@ -82,8 +92,14 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
     </li>
   ))
 
-  const categoryMapper = (categoryList) => categoryList.map((category) => (
-    <li key={category.categoryId} className="category__container">
+  const categoryMapper = (categoryList, isCustom) => categoryList.map((category) => (
+    <li 
+      key={category.categoryId} 
+      className="category__container"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      data-index={category.categoryId}
+    >
       <button
         className={`category ${newExpense.categoryId == category.categoryId ? 'active' : ''}`}
         name="categoryId"
@@ -92,11 +108,23 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
       >
         <i className="fa-solid fa-circle" style={{ color: '#' + category.categoryColor }} />{category.categoryName}
       </button>
+      {
+        isCustom && (
+          <>
+            <button className={"overlay__edit " + (hoveredElement == category.categoryId ? "overlay-button" : "hidden")}>
+              <i className="fa-solid fa-pencil" />
+            </button>
+            <button className={"overlay__delete " + (hoveredElement == category.categoryId ? "overlay-button" : "hidden")}>
+              <i className="fa-solid fa-trash" />
+            </button>
+          </>
+        )
+      }
     </li>
   ))
 
   const defaultCategories = categoryMapper(categoryData.filter(category => category.categoryId <= 8))
-  const customCategories = categoryMapper(categoryData.filter(category => category.categoryId > 8))
+  const customCategories = categoryMapper(categoryData.filter(category => category.categoryId > 8), true)
 
 
 
