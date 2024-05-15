@@ -88,7 +88,7 @@ export default function Calendar() {
         </ul>
       </div>
       <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={style}>
-        <CalendarModal closeModal={closeModal} expenses={modalContent} categories={userResources.userCategories}/>
+        <CalendarModal closeModal={closeModal} date={modalContent?.date} expenses={modalContent?.expenses} categories={userResources.userCategories}/>
       </Modal>
     </>
   )

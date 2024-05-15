@@ -1,5 +1,6 @@
 import CalendarItem from "../../components/budget/calendar/CalendarItem"
 import { mapExpenseTotalsLinearly } from "../resource/expenseMappers.service"
+import dayjs from "dayjs"
 
 export const getYearOptions = () => {
   const yearOptions = []
@@ -32,7 +33,7 @@ export const getMonthItems = (options, openModal) => {
 
   return mappedExpenses.map((expense, idx) => (
     <li key={idx} className="calendar-item__container">
-      <CalendarItem day={idx+1} expenses={expense} openModal={openModal}/>
+      <CalendarItem date={dayjs(expense.date)} expenses={expense} openModal={openModal}/>
     </li>
   ))
 }

@@ -1,10 +1,13 @@
 import dayjs from "dayjs"
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { UserContext } from "../../../context/UserContext"
 
-export default function CalendarModal({ closeModal, expenses, categories }) {
+export default function CalendarModal({ closeModal, date, expenses, categories }) {
+  const userContext = useContext(UserContext)
+
   const [isAddingExpense, setIsAddingExpense] = useState(false)
   const [isAddingCategory, setIsAddingCategory] = useState(false)
-  const [newExpense, setNewExpense] = useState({ expenseSum: 0, categoryId: 1 })
+  const [newExpense, setNewExpense] = useState({ expenseSum: 0, expenseDate: date.valueOf(), categoryId: 1 })
   const [newCategory, setNewCategory] = useState({ categoryName: "", categoryColor: "" })
 
 
@@ -42,7 +45,7 @@ export default function CalendarModal({ closeModal, expenses, categories }) {
     try {
 
     } catch (err) {
-      
+
     }
   }
 
@@ -55,10 +58,10 @@ export default function CalendarModal({ closeModal, expenses, categories }) {
 
   const categoryMapper = (categoryList) => categoryList.map((category) => (
     <li key={category.categoryId} className="category__container">
-      <button 
-        className={`category ${newExpense.categoryId == category.categoryId ? 'active' : ''}`} 
-        name="categoryId" 
-        value={category.categoryId} 
+      <button
+        className={`category ${newExpense.categoryId == category.categoryId ? 'active' : ''}`}
+        name="categoryId"
+        value={category.categoryId}
         onClick={handleExpenseChange}
       >
         <i className="fa-solid fa-circle" style={{ color: '#' + category.categoryColor }} />{category.categoryName}
@@ -91,6 +94,12 @@ export default function CalendarModal({ closeModal, expenses, categories }) {
                   min="0"
                   onChange={handleExpenseChange}
                   placeholder="Enter sum"
+                  required
+                />
+                <input
+                  type="hidden"
+                  name="expenseDate"
+                  value={newExpense.expenseDate}
                   required
                 />
                 <input
