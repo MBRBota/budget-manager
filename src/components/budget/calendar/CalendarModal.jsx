@@ -47,7 +47,8 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
         baseExpenses: [...prevExpenseData.baseExpenses, response.data.newExpense ],
         total: prevExpenseData.total + Number(response.data.newExpense.expenseSum)
       }))
-      
+
+      setIsAddingExpense(false)
       setShouldRefresh(true)
     } catch (err) {
       console.log(err)
