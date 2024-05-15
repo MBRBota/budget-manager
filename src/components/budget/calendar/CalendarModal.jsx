@@ -1,6 +1,8 @@
 import { useContext, useState } from "react"
 import { UserContext } from "../../../context/UserContext"
 import { postCategory, postExpense } from "../../../services/resource/postResource.service"
+import { patchCategory } from "../../../services/resource/patchResource.service"
+import { deleteCategory } from "../../../services/resource/deleteResource.service"
 
 export default function CalendarModal({ closeModal, setShouldRefresh, date, expenses, categories }) {
   const { user, setUser } = useContext(UserContext)
@@ -18,25 +20,25 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
   // PATCH/DELETE states
   const [hoveredElement, setHoveredElement] = useState(null)
   const [editCategory, setEditCategory] = useState(null)
-  const [editCategoryData, setEditCategoryData] = useState({ categoryName: "", categoryColor: "" })
+  const [editCategoryData, setEditCategoryData] = useState({ categoryId: "", categoryName: "", categoryColor: "" })
 
-  
+
   // New resource form input handlers
   const handleExpenseChange = (e) => {
     const { name, value } = e.target
     setNewExpense(prevExpense => ({ ...prevExpense, [name]: value }))
   }
-  
+
   const handleCategoryChange = (e) => {
     const { name, value } = e.target
     setNewCategory(prevCategory => ({ ...prevCategory, [name]: value }))
   }
-  
+
   // New resource togglers
   const toggleAddingExpense = () => {
     setIsAddingExpense(prevAdding => !prevAdding)
   }
-  
+
   const toggleAddingCategory = () => {
     setIsAddingCategory(prevAdding => !prevAdding)
   }
@@ -59,11 +61,11 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
 
 
   const toggleEditingCategory = (e) => {
-    const value = e.currentTarget?.value || null
+    const categoryId = e.currentTarget?.value || null
     const { categoryName, categoryColor } = e.currentTarget?.dataset
 
-    setEditCategory(value)
-    setEditCategoryData({ categoryName, categoryColor })
+    setEditCategory(categoryId)
+    setEditCategoryData({ categoryId, categoryName, categoryColor })
   }
 
 
@@ -112,10 +114,44 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
 
   const handleCategoryEdit = async (e) => {
     e.preventDefault()
+
+    try {
+      const response = await patchCategory(user.accessToken, editCategoryData)
+
+      if (!response?.success)
+        setUser(null)
+
+      const { updatedCategory } = response.data
+
+      setCategoryData(prevCategoryData => prevCategoryData.map(category => {
+        return category.categoryId == updatedCategory.categoryId ? updatedCategory : category
+      }))
+
+      setEditCategory(null)
+      setShouldRefresh(true)
+    } catch (err) {
+      console.log(err)
+      setUser(null)
+    }
   }
 
   const handleCategoryDelete = async (e) => {
-    e.preventDefault()
+    const { value } = e.currentTarget
+
+    try {
+      const response = await deleteCategory(user.accessToken, value)
+
+      if (!response?.success)
+        setUser(null)
+
+      setCategoryData(prevCategoryData => prevCategoryData.filter(category => category.categoryId != value))
+      setEditCategory(null)
+      setEditCategoryData({ categoryId: "", categoryName: "", categoryColor: "" })
+      setShouldRefresh(true)
+    } catch (err) {
+      console.log(err)
+      setUser(null)
+    }
   }
 
 
@@ -162,6 +198,12 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
                 placeholder="Enter category name"
                 required
               />
+              <input
+                type="hidden"
+                name="categoryId"
+                value={editCategoryData.categoryId}
+                required
+              />
               <button className="category-form__submit" type="submit"><i className="fa-solid fa-floppy-disk" /></button>
               <button className="category-form__cancel" type="button" onClick={toggleEditingCategory}><i className="fa-solid fa-ban" /></button>
             </form>
@@ -179,7 +221,7 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
               {
                 isCustom && (
                   <>
-                    <button 
+                    <button
                       className={"overlay__edit " + (hoveredElement == category.categoryId ? "overlay-button" : "invisible")}
                       value={category.categoryId}
                       data-category-name={category.categoryName}
@@ -189,9 +231,9 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
                       <i className="fa-solid fa-pencil" />
                     </button>
                     <button
-                     className={"overlay__delete " + (hoveredElement == category.categoryId ? "overlay-button" : "invisible")}
-                     value={category.categoryId}
-                     onClick={handleCategoryDelete}
+                      className={"overlay__delete " + (hoveredElement == category.categoryId ? "overlay-button" : "invisible")}
+                      value={category.categoryId}
+                      onClick={handleCategoryDelete}
                     >
                       <i className="fa-solid fa-trash" />
                     </button>
