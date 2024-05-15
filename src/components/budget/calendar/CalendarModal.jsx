@@ -1,7 +1,7 @@
 import dayjs from "dayjs"
 import { useContext, useState } from "react"
 import { UserContext } from "../../../context/UserContext"
-import { postExpense } from "../../../services/resource/postResource.service"
+import { postCategory, postExpense } from "../../../services/resource/postResource.service"
 
 export default function CalendarModal({ closeModal, setShouldRefresh, date, expenses, categories }) {
   const { user, setUser } = useContext(UserContext)
@@ -11,7 +11,7 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
 
   const [isAddingExpense, setIsAddingExpense] = useState(false)
   const [isAddingCategory, setIsAddingCategory] = useState(false)
-  const [newExpense, setNewExpense] = useState({ expenseSum: 0, expenseDate: date.valueOf(), categoryId: 1 })
+  const [newExpense, setNewExpense] = useState({ expenseSum: '', expenseDate: date.valueOf(), categoryId: 1 })
   const [newCategory, setNewCategory] = useState({ categoryName: "", categoryColor: "" })
 
 
@@ -59,9 +59,18 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
     e.preventDefault()
 
     try {
+      const response = await postCategory(user.accessToken, newCategory)
 
+      if (!response?.success)
+        setUser(null)
+
+      setCategoryData(prevCategoryData => [...prevCategoryData, response.data.newCategory])
+
+      setIsAddingCategory(false)
+      setShouldRefresh(true)
     } catch (err) {
-
+      console.log(err)
+      setUser(null)
     }
   }
 
@@ -107,7 +116,7 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
                   type="number"
                   name="expenseSum"
                   value={newExpense.expenseSum}
-                  min="0"
+                  min="1"
                   onChange={handleExpenseChange}
                   placeholder="Enter sum"
                   required
@@ -158,6 +167,7 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
                                 id="categoryColor"
                                 className="category-form__color"
                                 value={newCategory.categoryColor}
+                                minLength="6"
                                 maxLength="8"
                                 onChange={handleCategoryChange}
                                 placeholder="Color (hex)"
