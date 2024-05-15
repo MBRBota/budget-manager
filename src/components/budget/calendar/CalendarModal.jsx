@@ -7,6 +7,7 @@ export default function CalendarModal({ closeModal, expenses, categories }) {
   const [newExpense, setNewExpense] = useState({ expenseSum: 0, categoryId: 1 })
   const [newCategory, setNewCategory] = useState({ categoryName: "", categoryColor: "" })
 
+
   const handleExpenseChange = (e) => {
     const { name, value } = e.target
     setNewExpense(prevExpense => ({ ...prevExpense, [name]: value }))
@@ -25,6 +26,27 @@ export default function CalendarModal({ closeModal, expenses, categories }) {
     setIsAddingCategory(prevAdding => !prevAdding)
   }
 
+  const handleExpenseSubmit = async (e) => {
+    e.preventDefault()
+
+    try {
+
+    } catch (err) {
+
+    }
+  }
+
+  const handleCategorySubmit = async (e) => {
+    e.preventDefault()
+
+    try {
+
+    } catch (err) {
+      
+    }
+  }
+
+
   const baseExpenses = expenses.baseExpenses.map((expense, idx) => (
     <li key={idx} className="modal-expense">
       <h3><i className="fa-solid fa-circle" style={{ color: '#' + expense.categoryColor }} />{Number(expense.expenseSum)} RON - {expense.categoryName}</h3>
@@ -32,8 +54,13 @@ export default function CalendarModal({ closeModal, expenses, categories }) {
   ))
 
   const categoryMapper = (categoryList) => categoryList.map((category) => (
-    <li key={category.categoryId} className="category__wrapper">
-      <button className="category" name="categoryId" value={category.categoryId} onClick={handleExpenseChange}>
+    <li key={category.categoryId} className="category__container">
+      <button 
+        className={`category ${newExpense.categoryId == category.categoryId ? 'active' : ''}`} 
+        name="categoryId" 
+        value={category.categoryId} 
+        onClick={handleExpenseChange}
+      >
         <i className="fa-solid fa-circle" style={{ color: '#' + category.categoryColor }} />{category.categoryName}
       </button>
     </li>
@@ -56,6 +83,7 @@ export default function CalendarModal({ closeModal, expenses, categories }) {
           ? (
             <>
               <form className="expense-form">
+                <button type="button" onClick={toggleAddingExpense}><i className="fa-solid fa-square-caret-left" /></button>
                 <input
                   type="number"
                   name="expenseSum"
@@ -111,8 +139,8 @@ export default function CalendarModal({ closeModal, expenses, categories }) {
                                 required
                               />
                             </label>
-                            <button className="category-form__submit" type="submit"><i className="fa-solid fa-floppy-disk"/></button>
-                            <button className="category-form__cancel" onClick={toggleAddingCategory}><i className="fa-solid fa-ban"/></button>
+                            <button className="category-form__submit" type="submit"><i className="fa-solid fa-floppy-disk" /></button>
+                            <button className="category-form__cancel" type="button" onClick={toggleAddingCategory}><i className="fa-solid fa-ban" /></button>
                           </form>
                         )
                         : (
