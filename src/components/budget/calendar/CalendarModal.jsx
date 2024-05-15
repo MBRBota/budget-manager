@@ -5,29 +5,45 @@ import { postCategory, postExpense } from "../../../services/resource/postResour
 export default function CalendarModal({ closeModal, setShouldRefresh, date, expenses, categories }) {
   const { user, setUser } = useContext(UserContext)
 
+  // Prop data to state initialization
   const [expenseData, setExpenseData] = useState(expenses)
   const [categoryData, setCategoryData] = useState(categories)
 
+  // POST form states
   const [isAddingExpense, setIsAddingExpense] = useState(false)
   const [isAddingCategory, setIsAddingCategory] = useState(false)
   const [newExpense, setNewExpense] = useState({ expenseSum: '', expenseDate: date.valueOf(), categoryId: 1 })
   const [newCategory, setNewCategory] = useState({ categoryName: "", categoryColor: "" })
 
+  // PATCH/DELETE states
   const [hoveredElement, setHoveredElement] = useState(null)
+  const [editCategory, setEditCategory] = useState(null)
+  const [editCategoryData, setEditCategoryData] = useState({ categoryName: "", categoryColor: "" })
 
-
+  
+  // New resource form input handlers
   const handleExpenseChange = (e) => {
     const { name, value } = e.target
     setNewExpense(prevExpense => ({ ...prevExpense, [name]: value }))
   }
-
+  
   const handleCategoryChange = (e) => {
     const { name, value } = e.target
     setNewCategory(prevCategory => ({ ...prevCategory, [name]: value }))
   }
+  
+  // New resource togglers
+  const toggleAddingExpense = () => {
+    setIsAddingExpense(prevAdding => !prevAdding)
+  }
+  
+  const toggleAddingCategory = () => {
+    setIsAddingCategory(prevAdding => !prevAdding)
+  }
 
+  // Custom category overlay handlers
   const handleMouseEnter = (e) => {
-    const index = e.currentTarget.dataset.index
+    const { index } = e.currentTarget.dataset
     setHoveredElement(index)
   }
 
@@ -35,14 +51,23 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
     setHoveredElement(null)
   }
 
-  const toggleAddingExpense = () => {
-    setIsAddingExpense(prevAdding => !prevAdding)
+  // Custom category edit form input handlers
+  const handleCategoryEditChange = (e) => {
+    const { name, value } = e.target
+    setEditCategoryData(prevCategory => ({ ...prevCategory, [name]: value }))
   }
 
-  const toggleAddingCategory = () => {
-    setIsAddingCategory(prevAdding => !prevAdding)
+
+  const toggleEditingCategory = (e) => {
+    const value = e.currentTarget?.value || null
+    const { categoryName, categoryColor } = e.currentTarget?.dataset
+
+    setEditCategory(value)
+    setEditCategoryData({ categoryName, categoryColor })
   }
 
+
+  // New resource form submit handlers
   const handleExpenseSubmit = async (e) => {
     e.preventDefault()
 
@@ -85,6 +110,14 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
     }
   }
 
+  const handleCategoryEdit = async (e) => {
+    e.preventDefault()
+  }
+
+  const handleCategoryDelete = async (e) => {
+    e.preventDefault()
+  }
+
 
   const baseExpenses = expenseData.baseExpenses.map((expense, idx) => (
     <li key={idx} className="modal-expense">
@@ -93,32 +126,80 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
   ))
 
   const categoryMapper = (categoryList, isCustom) => categoryList.map((category) => (
-    <li 
-      key={category.categoryId} 
+    <li
+      key={category.categoryId}
       className="category__container"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       data-index={category.categoryId}
     >
-      <button
-        className={`category ${newExpense.categoryId == category.categoryId ? 'active' : ''}`}
-        name="categoryId"
-        value={category.categoryId}
-        onClick={handleExpenseChange}
-      >
-        <i className="fa-solid fa-circle" style={{ color: '#' + category.categoryColor }} />{category.categoryName}
-      </button>
       {
-        isCustom && (
-          <>
-            <button className={"overlay__edit " + (hoveredElement == category.categoryId ? "overlay-button" : "hidden")}>
-              <i className="fa-solid fa-pencil" />
-            </button>
-            <button className={"overlay__delete " + (hoveredElement == category.categoryId ? "overlay-button" : "hidden")}>
-              <i className="fa-solid fa-trash" />
-            </button>
-          </>
-        )
+        editCategory == category.categoryId
+          ? (
+            <form className="category-form" onSubmit={handleCategoryEdit}>
+              <label>
+                <i className="fa-solid fa-circle" style={{ color: '#' + editCategoryData.categoryColor }} />
+                #
+                <input
+                  type="text"
+                  name="categoryColor"
+                  className="category-form__color"
+                  value={editCategoryData.categoryColor}
+                  minLength="6"
+                  maxLength="8"
+                  onChange={handleCategoryEditChange}
+                  placeholder="Color (hex)"
+                  required
+                />
+              </label>
+              <input
+                type="text"
+                name="categoryName"
+                className="category-form__name"
+                value={editCategoryData.categoryName}
+                maxLength="20"
+                onChange={handleCategoryEditChange}
+                placeholder="Enter category name"
+                required
+              />
+              <button className="category-form__submit" type="submit"><i className="fa-solid fa-floppy-disk" /></button>
+              <button className="category-form__cancel" type="button" onClick={toggleEditingCategory}><i className="fa-solid fa-ban" /></button>
+            </form>
+          )
+          : (
+            <>
+              <button
+                className={`category ${newExpense.categoryId == category.categoryId ? 'active' : ''}`}
+                name="categoryId"
+                value={category.categoryId}
+                onClick={handleExpenseChange}
+              >
+                <i className="fa-solid fa-circle" style={{ color: '#' + category.categoryColor }} />{category.categoryName}
+              </button>
+              {
+                isCustom && (
+                  <>
+                    <button 
+                      className={"overlay__edit " + (hoveredElement == category.categoryId ? "overlay-button" : "invisible")}
+                      value={category.categoryId}
+                      data-category-name={category.categoryName}
+                      data-category-color={category.categoryColor}
+                      onClick={toggleEditingCategory}
+                    >
+                      <i className="fa-solid fa-pencil" />
+                    </button>
+                    <button
+                     className={"overlay__delete " + (hoveredElement == category.categoryId ? "overlay-button" : "invisible")}
+                     value={category.categoryId}
+                     onClick={handleCategoryDelete}
+                    >
+                      <i className="fa-solid fa-trash" />
+                    </button>
+                  </>
+                )
+              }
+            </>
+          )
       }
     </li>
   ))
@@ -178,13 +259,12 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
                       isAddingCategory
                         ? (
                           <form className="category-form" onSubmit={handleCategorySubmit}>
-                            <label htmlFor="#categoryColor">
+                            <label>
                               <i className="fa-solid fa-circle" style={{ color: '#' + newCategory.categoryColor }} />
                               #
                               <input
                                 type="text"
                                 name="categoryColor"
-                                id="categoryColor"
                                 className="category-form__color"
                                 value={newCategory.categoryColor}
                                 minLength="6"
