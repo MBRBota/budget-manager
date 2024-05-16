@@ -17,7 +17,18 @@ export const loginUser = async (userCredentials) => {
   return data
 }
 
+export const logoutUser = async (accessToken) => {
+  const { data } = await authApi.post(
+    APP_CONSTANTS.API_ENDPOINTS.AUTH_ENDPOINTS.LOGOUT_ENDPOINT,
+    {},
+    { headers: { "Authorization": `Bearer ${accessToken}` } }
+  )
+  return data
+}
+
 export const refreshUserToken = async () => {
-  const { data } = await authApi.get(APP_CONSTANTS.API_ENDPOINTS.AUTH_ENDPOINTS.TOKEN_ENDPOINT)
+  const { data } = await authApi.get(
+    APP_CONSTANTS.API_ENDPOINTS.AUTH_ENDPOINTS.TOKEN_ENDPOINT
+  )
   return data
 }

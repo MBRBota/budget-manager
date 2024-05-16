@@ -3,6 +3,7 @@ export const APP_CONSTANTS = {
     AUTH_ENDPOINTS: {
       REGISTER_ENDPOINT: '/api/auth/register',
       LOGIN_ENDPOINT: '/api/auth/login',
+      LOGOUT_ENDPOINT: '/api/auth/logout',
       TOKEN_ENDPOINT: '/api/auth/token'
     },
 
