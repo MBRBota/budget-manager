@@ -10,7 +10,7 @@
   top: 0;
   align-self: flex-start;
 
-  .navbar__header {
+  .navbar-header {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -24,9 +24,16 @@
     }
   }
 
-  .navbar__links {
+  .navbar-links__container {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     margin: 2.5rem 0;
+    height: 15rem;
+
+    .budget-links__container, .user-links__container {
+      display: flex;
+      flex-direction: column;
+    }
   }
 }
