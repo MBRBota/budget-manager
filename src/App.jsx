@@ -4,6 +4,7 @@ import SettingsPage from './pages/SettingsPage'
 import StatisticsPage from './pages/StatisticsPage'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
+import LogoutPage from './pages/LogoutPage'
 import ProtectedLayout from './components/layouts/ProtectedLayout'
 import AuthLayout from './components/layouts/AuthLayout'
 import './styles/App.scss'
@@ -22,6 +23,7 @@ function App() {
           <Route path="/statistics" element={<StatisticsPage/>} />
           <Route path="/calendar" element={<CalendarPage/>} />
           <Route path="/settings" element={<SettingsPage/>} />
+          <Route path="/logout" element={<LogoutPage/>} />
           <Route path="*" element={<Navigate to="/statistics"/>} />
         </Route>
       </Routes>
