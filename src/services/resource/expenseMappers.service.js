@@ -18,12 +18,14 @@ const getTimeSubUnit = (timeUnit) => {
       return 'week'
     case 'year':
       return 'month'
+    default:
+      return 'day'
   }
 }
 
 // Take a date and the type of timescale it will be displayed on
 // Return the timescale relative value
-const getComparisonDate = (date, timeUnit, timeValue) => {
+const getTimescaleRelativeDate = (date, timeUnit, timeValue) => {
     switch (timeUnit) {
       case 'week':
         return date.day(timeValue)
@@ -34,6 +36,9 @@ const getComparisonDate = (date, timeUnit, timeValue) => {
         return date.week(timeValue)
       case 'year':
         return date.month(timeValue)
+      default:
+        // Default to month if no timeUnit provided
+        return date.date(timeValue + 1)
     }
 }
 
@@ -50,36 +55,21 @@ const getEndOfUnit = (date, timeUnit) => {
     case 'year':
       // 12 months in a year, 0 indexed
       return 11
+    default:
+      // Default to month if no timeUnit provided
+      return date.daysInMonth() - 1
   }
 }
 
 const getDefaultOfUnit = (date, timeUnit, timeValue) => {
-  let unitDefault
-
-  switch (timeUnit) {
-    case 'week':
-      unitDefault = date.day(timeValue)
-      break;
-    case 'month':
-      // timeValue comes as a 0 indexed day of the month, while date method expects 1 indexed
-      unitDefault = date.date(timeValue + 1)
-      break;
-    case 'quarter':
-      unitDefault = date.week(timeValue)
-      break;
-    case 'year':
-      unitDefault = date.month(timeValue)
-      break;
-  }
-
-  return unitDefault.startOf('day').valueOf()
+  return getTimescaleRelativeDate(date, timeUnit, timeValue).startOf('day').valueOf()
 }
 
 const getFilteredByRangeExpenses = (userExpenses, date, timeUnit, timeValue, requireSubUnit) => {
   return userExpenses.filter(({ expenseDate }) => {
     const convertedDate = dayjs(Number(expenseDate))
     const comparisonUnit = requireSubUnit ? getTimeSubUnit(timeUnit) : timeUnit
-    const comparisonDate = getComparisonDate(date, timeUnit, timeValue)
+    const comparisonDate = getTimescaleRelativeDate(date, timeUnit, timeValue)
 
     return convertedDate.isSame(comparisonDate, comparisonUnit)
   })
