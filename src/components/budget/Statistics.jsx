@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from "react"
 import { UserContext } from "../../context/UserContext"
 import { getUserResources } from "../../services/resource/getResource.service"
+// eslint-disable-next-line no-unused-vars
 import { Chart as ChartJS } from 'chart.js/auto'
 import 'chartjs-adapter-dayjs-4/dist/chartjs-adapter-dayjs-4.esm'
 import LineChart from "./statistics/LineChart"
