@@ -1,8 +1,7 @@
 import { useContext, useState } from "react"
 import { UserContext } from "../../../context/UserContext"
 import { postCategory, postExpense } from "../../../services/resource/postResource.service"
-import { patchCategory } from "../../../services/resource/patchResource.service"
-import { deleteCategory } from "../../../services/resource/deleteResource.service"
+import CustomCategory from "./modal/CustomCategory"
 
 export default function CalendarModal({ closeModal, setShouldRefresh, date, expenses, categories }) {
   const { user, setUser } = useContext(UserContext)
@@ -16,11 +15,6 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
   const [isAddingCategory, setIsAddingCategory] = useState(false)
   const [newExpense, setNewExpense] = useState({ expenseSum: '', expenseDate: date.valueOf(), categoryId: 1 })
   const [newCategory, setNewCategory] = useState({ categoryName: "", categoryColor: "" })
-
-  // PATCH/DELETE states
-  const [hoveredElement, setHoveredElement] = useState(null)
-  const [editCategory, setEditCategory] = useState(null)
-  const [editCategoryData, setEditCategoryData] = useState({ categoryId: "", categoryName: "", categoryColor: "" })
 
 
   // New resource form input handlers
@@ -42,32 +36,6 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
   const toggleAddingCategory = () => {
     setIsAddingCategory(prevAdding => !prevAdding)
   }
-
-  // Custom category overlay handlers
-  const handleMouseEnter = (e) => {
-    const { index } = e.currentTarget.dataset
-    setHoveredElement(index)
-  }
-
-  const handleMouseLeave = () => {
-    setHoveredElement(null)
-  }
-
-  // Custom category edit form input handlers
-  const handleCategoryEditChange = (e) => {
-    const { name, value } = e.target
-    setEditCategoryData(prevCategory => ({ ...prevCategory, [name]: value }))
-  }
-
-
-  const toggleEditingCategory = (e) => {
-    const categoryId = e.currentTarget?.value || null
-    const { categoryName, categoryColor } = e.currentTarget?.dataset
-
-    setEditCategory(categoryId)
-    setEditCategoryData({ categoryId, categoryName, categoryColor })
-  }
-
 
   // New resource form submit handlers
   const handleExpenseSubmit = async (e) => {
@@ -112,48 +80,19 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
     }
   }
 
-  const handleCategoryEdit = async (e) => {
-    e.preventDefault()
+  const onCategoryEdit = (updatedCategory) => {
+    setCategoryData(prevCategoryData => prevCategoryData.map(category => {
+      return category.categoryId === updatedCategory.categoryId ? updatedCategory : category
+    }))
 
-    try {
-      const response = await patchCategory(user.accessToken, editCategoryData)
-
-      if (!response?.success)
-        setUser(null)
-
-      const { updatedCategory } = response.data
-
-      setCategoryData(prevCategoryData => prevCategoryData.map(category => {
-        return category.categoryId == updatedCategory.categoryId ? updatedCategory : category
-      }))
-
-      setEditCategory(null)
-      setShouldRefresh(true)
-    } catch (err) {
-      console.log(err)
-      setUser(null)
-    }
+    setShouldRefresh(true)
   }
 
-  const handleCategoryDelete = async (e) => {
-    const { value } = e.currentTarget
+  const onCategoryDelete = (deletedId) => {
+    setCategoryData(prevCategoryData => prevCategoryData.filter(category => category.categoryId !== deletedId))
 
-    try {
-      const response = await deleteCategory(user.accessToken, value)
-
-      if (!response?.success)
-        setUser(null)
-
-      setCategoryData(prevCategoryData => prevCategoryData.filter(category => category.categoryId != value))
-      setEditCategory(null)
-      setEditCategoryData({ categoryId: "", categoryName: "", categoryColor: "" })
-      setShouldRefresh(true)
-    } catch (err) {
-      console.log(err)
-      setUser(null)
-    }
+    setShouldRefresh(true)
   }
-
 
   const baseExpenses = expenseData.baseExpenses.map((expense, idx) => (
     <li key={idx} className="modal-expense">
@@ -161,89 +100,29 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
     </li>
   ))
 
-  const categoryMapper = (categoryList, isCustom) => categoryList.map((category) => (
-    <li
-      key={category.categoryId}
-      className="category__container"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      data-index={category.categoryId}
-    >
-      {
-        editCategory == category.categoryId
-          ? (
-            <form className="category-form" onSubmit={handleCategoryEdit}>
-              <label>
-                <i className="fa-solid fa-circle" style={{ color: '#' + editCategoryData.categoryColor }} />
-                #
-                <input
-                  type="text"
-                  name="categoryColor"
-                  className="category-form__color"
-                  value={editCategoryData.categoryColor}
-                  minLength="6"
-                  maxLength="8"
-                  onChange={handleCategoryEditChange}
-                  placeholder="Color (hex)"
-                  required
-                />
-              </label>
-              <input
-                type="text"
-                name="categoryName"
-                className="category-form__name"
-                value={editCategoryData.categoryName}
-                maxLength="20"
-                onChange={handleCategoryEditChange}
-                placeholder="Enter category name"
-                required
-              />
-              <input
-                type="hidden"
-                name="categoryId"
-                value={editCategoryData.categoryId}
-                required
-              />
-              <button className="category-form__submit" type="submit"><i className="fa-solid fa-floppy-disk" /></button>
-              <button className="category-form__cancel" type="button" onClick={toggleEditingCategory}><i className="fa-solid fa-ban" /></button>
-            </form>
-          )
-          : (
-            <>
-              <button
-                className={`category ${newExpense.categoryId == category.categoryId ? 'active' : ''}`}
-                name="categoryId"
-                value={category.categoryId}
-                onClick={handleExpenseChange}
-              >
-                <i className="fa-solid fa-circle" style={{ color: '#' + category.categoryColor }} />{category.categoryName}
-              </button>
-              {
-                isCustom && (
-                  <>
-                    <button
-                      className={"overlay__edit " + (hoveredElement == category.categoryId ? "overlay-button" : "invisible")}
-                      value={category.categoryId}
-                      data-category-name={category.categoryName}
-                      data-category-color={category.categoryColor}
-                      onClick={toggleEditingCategory}
-                    >
-                      <i className="fa-solid fa-pencil" />
-                    </button>
-                    <button
-                      className={"overlay__delete " + (hoveredElement == category.categoryId ? "overlay-button" : "invisible")}
-                      value={category.categoryId}
-                      onClick={handleCategoryDelete}
-                    >
-                      <i className="fa-solid fa-trash" />
-                    </button>
-                  </>
-                )
-              }
-            </>
-          )
-      }
-    </li>
+  const categoryMapper = (categoryList, isCustom = false) => categoryList.map((category) => (
+    isCustom ? (
+        <CustomCategory
+          key={category.categoryId}
+          categoryId={category.categoryId}
+          categoryName={category.categoryName}
+          categoryColor={category.categoryColor}
+          selectedId={Number(newExpense.categoryId)}
+          handleExpenseChange={handleExpenseChange}
+          onCategoryDelete={onCategoryDelete}
+          onCategoryEdit={onCategoryEdit}
+        />
+    ) :
+      <li key={category.categoryId} className="category__container">
+        <button
+          className={`category ${Number(newExpense.categoryId) === category.categoryId ? 'active' : ''}`}
+          name="categoryId"
+          value={category.categoryId}
+          onClick={handleExpenseChange}
+        >
+          <i className="fa-solid fa-circle" style={{ color: '#' + category.categoryColor }} />{category.categoryName}
+        </button>
+      </li>
   ))
 
   const defaultCategories = categoryMapper(categoryData.filter(category => category.categoryId <= 8))
