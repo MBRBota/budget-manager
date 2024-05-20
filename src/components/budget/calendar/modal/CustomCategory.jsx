@@ -2,6 +2,7 @@ import { useContext, useState } from 'react';
 import { patchCategory } from '../../../../services/resource/patchResource.service';
 import { deleteCategory } from '../../../../services/resource/deleteResource.service';
 import { UserContext } from '../../../../context/UserContext';
+import CategoryForm from './CategoryForm';
 
 export default function CustomCategory({
   categoryId,
@@ -15,13 +16,7 @@ export default function CustomCategory({
   const { user, setUser } = useContext(UserContext);
 
   const [isHovered, setIsHovered] = useState(false);
-  const [editData, setEditData] = useState({ categoryId, categoryName, categoryColor });
   const [isEditing, setIsEditing] = useState(false);
-
-  const handleCategoryDataChange = (e) => {
-    const { name, value } = e.target;
-    setEditData((prevData) => ({ ...prevData, [name]: value }));
-  };
 
   const toggleIsEditing = () => {
     setIsEditing((prevEditing) => !prevEditing);
@@ -30,8 +25,11 @@ export default function CustomCategory({
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
+    const formData = new FormData(e.target)
+    const patchData = { categoryId: formData.get('categoryId'), categoryName: formData.get('categoryName'), categoryColor: formData.get('categoryColor') }
+    
     try {
-      const response = await patchCategory(user.accessToken, editData);
+      const response = await patchCategory(user.accessToken, patchData);
 
       const { updatedCategory } = response.data;
 
@@ -65,40 +63,12 @@ export default function CustomCategory({
       data-index={categoryId}
     >
       {isEditing ? (
-        <form className="category-form" onSubmit={handleEditSubmit}>
-          <label>
-            <i className="fa-solid fa-circle" style={{ color: '#' + editData.categoryColor }} />
-            #
-            <input
-              type="text"
-              name="categoryColor"
-              className="category-form__color"
-              value={editData.categoryColor}
-              minLength="6"
-              maxLength="8"
-              onChange={handleCategoryDataChange}
-              placeholder="Color (hex)"
-              required
-            />
-          </label>
-          <input
-            type="text"
-            name="categoryName"
-            className="category-form__name"
-            value={editData.categoryName}
-            maxLength="20"
-            onChange={handleCategoryDataChange}
-            placeholder="Enter category name"
-            required
-          />
-          <input type="hidden" name="categoryId" value={editData.categoryId} required />
-          <button className="category-form__submit" type="submit">
-            <i className="fa-solid fa-floppy-disk" />
-          </button>
-          <button className="category-form__cancel" type="button" onClick={toggleIsEditing}>
-            <i className="fa-solid fa-ban" />
-          </button>
-        </form>
+        <CategoryForm
+          initialData={{ categoryId, categoryName, categoryColor }}
+          isEdit={true}
+          onSubmit={handleEditSubmit}
+          toggleForm={toggleIsEditing}
+        />
       ) : (
         <>
           <button

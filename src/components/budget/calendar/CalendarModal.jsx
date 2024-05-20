@@ -2,6 +2,7 @@ import { useContext, useState } from 'react';
 import { UserContext } from '../../../context/UserContext';
 import { postCategory, postExpense } from '../../../services/resource/postResource.service';
 import CustomCategory from './modal/CustomCategory';
+import CategoryForm from './modal/CategoryForm';
 
 export default function CalendarModal({ closeModal, setShouldRefresh, date, expenses, categories }) {
   const { user, setUser } = useContext(UserContext);
@@ -14,17 +15,11 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
   const [isAddingExpense, setIsAddingExpense] = useState(false);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [newExpense, setNewExpense] = useState({ expenseSum: '', expenseDate: date.valueOf(), categoryId: 1 });
-  const [newCategory, setNewCategory] = useState({ categoryName: '', categoryColor: '' });
 
   // New resource form input handlers
   const handleExpenseChange = (e) => {
     const { name, value } = e.target;
     setNewExpense((prevExpense) => ({ ...prevExpense, [name]: value }));
-  };
-
-  const handleCategoryChange = (e) => {
-    const { name, value } = e.target;
-    setNewCategory((prevCategory) => ({ ...prevCategory, [name]: value }));
   };
 
   // New resource togglers
@@ -62,10 +57,11 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
   const handleCategorySubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await postCategory(user.accessToken, newCategory);
+    const formData = new FormData(e.target)
+    const postData = { categoryName: formData.get('categoryName'), categoryColor: formData.get('categoryColor') }
 
-      if (!response?.success) setUser(null);
+    try {
+      const response = await postCategory(user.accessToken, postData);
 
       setCategoryData((prevCategoryData) => [...prevCategoryData, response.data.newCategory]);
 
@@ -174,39 +170,12 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
               {customCategories}
               <li>
                 {isAddingCategory ? (
-                  <form className="category-form" onSubmit={handleCategorySubmit}>
-                    <label>
-                      <i className="fa-solid fa-circle" style={{ color: '#' + newCategory.categoryColor }} />
-                      #
-                      <input
-                        type="text"
-                        name="categoryColor"
-                        className="category-form__color"
-                        value={newCategory.categoryColor}
-                        minLength="6"
-                        maxLength="8"
-                        onChange={handleCategoryChange}
-                        placeholder="Color (hex)"
-                        required
-                      />
-                    </label>
-                    <input
-                      type="text"
-                      name="categoryName"
-                      className="category-form__name"
-                      value={newCategory.categoryName}
-                      maxLength="20"
-                      onChange={handleCategoryChange}
-                      placeholder="Enter category name"
-                      required
-                    />
-                    <button className="category-form__submit" type="submit">
-                      <i className="fa-solid fa-floppy-disk" />
-                    </button>
-                    <button className="category-form__cancel" type="button" onClick={toggleAddingCategory}>
-                      <i className="fa-solid fa-ban" />
-                    </button>
-                  </form>
+                  <CategoryForm 
+                    initialData={{ categoryName: '', categoryColor: '' }}
+                    isEdit={false}
+                    onSubmit={handleCategorySubmit}
+                    toggleForm={toggleAddingCategory}
+                  />
                 ) : (
                   <button className="category__add" onClick={toggleAddingCategory}>
                     <i className="fa-regular fa-square-plus" />
