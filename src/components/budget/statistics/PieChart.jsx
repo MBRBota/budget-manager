@@ -1,30 +1,29 @@
-import { useState } from "react";
-import { Pie } from "react-chartjs-2";
-import { mapExpenseTotalsByCategory } from "../../../services/resource/expenseMappers.service";
-import dayjs from "dayjs";
-
+import { useState } from 'react';
+import { Pie } from 'react-chartjs-2';
+import { mapExpenseTotalsByCategory } from '../../../services/resource/expenseMappers.service';
+import dayjs from 'dayjs';
 
 export default function PieChart({ userExpenses }) {
-  const [timeUnit, setTimeUnit] = useState('month')
+  const [timeUnit, setTimeUnit] = useState('month');
 
   const handleUnitChange = (e) => {
-    const { value } = e.target
+    const { value } = e.target;
 
-    setTimeUnit(value)
-  }
+    setTimeUnit(value);
+  };
 
-  const [pieLabels, pieColors, pieValues] = mapExpenseTotalsByCategory(userExpenses, dayjs(), timeUnit)
+  const [pieLabels, pieColors, pieValues] = mapExpenseTotalsByCategory(userExpenses, dayjs(), timeUnit);
 
   const data = {
     labels: pieLabels,
     datasets: [
-      { 
+      {
         label: 'Total',
         data: pieValues,
-        backgroundColor: pieColors
-      }
-    ]
-  }
+        backgroundColor: pieColors,
+      },
+    ],
+  };
 
   return (
     <>
@@ -38,5 +37,5 @@ export default function PieChart({ userExpenses }) {
         <Pie data={data} />
       </div>
     </>
-  )
+  );
 }

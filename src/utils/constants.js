@@ -4,12 +4,12 @@ export const APP_CONSTANTS = {
       REGISTER_ENDPOINT: '/api/auth/register',
       LOGIN_ENDPOINT: '/api/auth/login',
       LOGOUT_ENDPOINT: '/api/auth/logout',
-      TOKEN_ENDPOINT: '/api/auth/token'
+      TOKEN_ENDPOINT: '/api/auth/token',
     },
 
     BUDGET_ENDPOINTS: {
       EXPENSE_ENDPOINT: '/api/budget/expense',
-      CATEGORY_ENDPOINT: '/api/budget/category'
-    }
-  }
-}
+      CATEGORY_ENDPOINT: '/api/budget/category',
+    },
+  },
+};

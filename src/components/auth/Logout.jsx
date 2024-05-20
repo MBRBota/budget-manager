@@ -1,24 +1,23 @@
-import { useContext, useEffect } from "react"
-import { UserContext } from "../../context/UserContext"
-import { logoutUser } from "../../services/auth.service"
-
+import { useContext, useEffect } from 'react';
+import { UserContext } from '../../context/UserContext';
+import { logoutUser } from '../../services/auth.service';
 
 export default function Logout() {
-  const { user, setUser } = useContext(UserContext)
+  const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
     const userLogout = async () => {
       try {
-        await logoutUser(user.accessToken)
+        await logoutUser(user.accessToken);
 
-        setUser(null)
+        setUser(null);
       } catch (err) {
-        console.log(err)
-        setUser(null)
+        console.log(err);
+        setUser(null);
       }
-    }
-    userLogout()
-  }, [])
+    };
+    userLogout();
+  }, []);
 
-  return null
+  return null;
 }
