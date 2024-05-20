@@ -1,30 +1,55 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { UserContext } from './UserContext';
-import { refreshUserToken } from '../services/auth.service';
+import { loginUser, logoutUser, refreshUserToken } from '../services/auth.service';
 
 export default function UserContextProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Initialize user state using refresh token (if applicable) on first render
-  useEffect(() => {
-    const initializeUserContext = async () => {
+  const userLogin = useCallback(
+    async (userCredentials) => {
       try {
-        const response = await refreshUserToken();
+        const { data } = await loginUser(userCredentials);
 
-        // Early return if missing/invalid refresh token cookie, leaving user state as null
-        if (!response?.success) return;
-
-        setUser(response.data);
-        setIsLoaded(true);
+        setUser(data);
       } catch (err) {
+        // todo: Implement error notification instead of redirection on login fail
         console.log(err);
-        setIsLoaded(true);
       }
-    };
-    initializeUserContext();
+    },
+    [],
+  );
+
+  const userLogout = useCallback(async () => {
+    try {
+      await logoutUser(user.accessToken);
+
+      setUser(null);
+    } catch (err) {
+      console.log(err);
+      setUser(null);
+    }
+  }, [user?.accessToken]);
+
+  const userTokenRefresh = useCallback(async () => {
+    setIsLoaded(false);
+    try {
+      const { data } = await refreshUserToken();
+
+      setUser(data);
+    } catch (err) {
+      console.log(err);
+
+      setUser(null);
+    }
+    setIsLoaded(true);
   }, []);
 
-  const contextValue = { user, setUser };
+  // Initialize user state using refresh token (if applicable) on first render
+  useEffect(() => {
+    userTokenRefresh();
+  }, [userTokenRefresh]);
+
+  const contextValue = { user, userLogin, userLogout, userTokenRefresh };
   return isLoaded && <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 }
