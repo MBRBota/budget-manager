@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { useMemo, useState, useContext, useEffect } from 'react';
+import { useMemo, useState, useContext, useEffect, useCallback } from 'react';
 import { getMonthItems, getMonthOptions, getYearOptions } from '../../services/calendar/calenderMappers.service';
 import { UserContext } from '../../context/UserContext';
 import { getUserResources } from '../../services/resource/getResource.service';
@@ -8,7 +8,7 @@ import CalendarModal from './calendar/CalendarModal';
 import { style } from '../../styles/CalendarModal';
 
 export default function Calendar() {
-  const { user, setUser } = useContext(UserContext);
+  const { user, userTokenRefresh } = useContext(UserContext);
   const [userResources, setUserResources] = useState({ userCategories: [], userExpenses: [] });
   const [isLoaded, setIsLoaded] = useState(false);
   const [shouldRefresh, setShouldRefresh] = useState(false);
@@ -23,20 +23,24 @@ export default function Calendar() {
   const memoizedYearOptions = useMemo(() => getYearOptions(), []);
   const memoizedMonthOptions = useMemo(() => getMonthOptions(), []);
 
-  useEffect(() => {
-    const fetchResources = async () => {
+  const fetchResources = useCallback(async () => {
+    setIsLoaded(false);
+
+    try {
       const response = await getUserResources(user.accessToken);
 
-      if (!response?.success) setUser(null);
-
-      // Update user context access token if it was refreshed in request
-      if (response.data?.user) setUser(response.data.user);
-
       setUserResources(response.data);
-      setIsLoaded(true);
-    };
+    } catch (err) {
+      console.log(err);
+      userTokenRefresh();
+    }
+
+    setIsLoaded(true);
+  }, [user.accessToken, userTokenRefresh]);
+
+  useEffect(() => {
     fetchResources();
-  }, [isLoaded]);
+  }, [fetchResources]);
 
   const handleDateChange = (e) => {
     const { name, value } = e.target;
@@ -57,7 +61,7 @@ export default function Calendar() {
 
     if (shouldRefresh) {
       setShouldRefresh(false);
-      setIsLoaded(false);
+      fetchResources();
     }
   };
 

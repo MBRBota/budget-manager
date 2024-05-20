@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useCallback } from 'react';
 import { UserContext } from '../../context/UserContext';
 import { getUserResources } from '../../services/resource/getResource.service';
 // eslint-disable-next-line no-unused-vars
@@ -8,24 +8,28 @@ import LineChart from './statistics/LineChart';
 import PieChart from './statistics/PieChart';
 
 export default function Statistics() {
-  const { user, setUser } = useContext(UserContext);
+  const { user, userTokenRefresh } = useContext(UserContext);
   const [userResources, setUserResources] = useState({ userCategories: [], userExpenses: [] });
   const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    const fetchResources = async () => {
+  const fetchResources = useCallback(async () => {
+    setIsLoaded(false);
+
+    try {
       const response = await getUserResources(user.accessToken);
 
-      if (!response?.success) setUser(null);
-
-      // Update user context access token if it was refreshed in request
-      if (response.data?.user) setUser(response.data.user);
-
       setUserResources(response.data);
-      setIsLoaded(true);
-    };
+    } catch (err) {
+      console.log(err);
+      userTokenRefresh();
+    }
+
+    setIsLoaded(true);
+  }, [user.accessToken, userTokenRefresh]);
+
+  useEffect(() => {
     fetchResources();
-  }, []);
+  }, [fetchResources]);
 
   return (
     isLoaded && (
