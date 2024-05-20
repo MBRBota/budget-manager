@@ -12,7 +12,7 @@ export const postExpense = async (accessToken, expenseData) => {
   )
 
   if (!data?.success)
-    return await retryWithRefresh((newToken) => postExpense(newToken, requestData))
+    return await retryWithRefresh((newToken) => postExpense(newToken, expenseData))
 
   return data
 }
