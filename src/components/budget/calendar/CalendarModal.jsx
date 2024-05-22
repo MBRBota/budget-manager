@@ -3,6 +3,8 @@ import ExpenseForm from './modal/ExpenseForm';
 import { UserContext } from '../../../context/UserContext';
 import { postExpense } from '../../../services/resource/postResource.service';
 import Expense from './modal/Expense';
+import { patchExpense } from '../../../services/resource/patchResource.service';
+import { deleteExpense } from '../../../services/resource/deleteResource.service';
 
 export default function CalendarModal({ closeModal, setShouldRefresh, date, expenses, categories }) {
   const { user, userTokenRefresh } = useContext(UserContext);
@@ -51,22 +53,58 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
     }
   };
 
-  const handleExpenseDelete = async (e) => {
+  const handleExpenseEdit = async (e) => {
     e.preventDefault();
 
+    const formData = new FormData(e.target);
+    const patchData = {
+      expenseId: formData.get('expenseId'),
+      expenseSum: formData.get('expenseSum'),
+      expenseDate: formData.get('expenseDate'),
+      categoryId: formData.get('categoryId'),
+    };
+
     try {
-      //todo
+      const {
+        data: { updatedExpense },
+      } = await patchExpense(user.accessToken, patchData);
+
+      setExpenseData((prevExpenseData) => ({
+        ...prevExpenseData,
+        baseExpenses: prevExpenseData.baseExpenses.map((expense) => {
+          return expense.expenseId === updatedExpense.expenseId ? updatedExpense : expense;
+        }),
+        total:
+          prevExpenseData.total -
+          Number(
+            prevExpenseData.baseExpenses.find((expense) => expense.expenseId === updatedExpense.expenseId).expenseSum,
+          ) +
+          Number(updatedExpense.expenseSum),
+      }));
+
+      closeExpenseForm();
+      setShouldRefresh(true);
     } catch (err) {
       console.log(err);
       userTokenRefresh();
     }
   };
 
-  const handleExpenseEdit = (e) => {
+  const handleExpenseDelete = async (e) => {
     e.preventDefault();
-
+    
+    const expenseId = Number(e.currentTarget.value)
+    
     try {
-      //todo
+      await deleteExpense(user.accessToken, expenseId);
+
+      setExpenseData((prevExpenseData) => ({
+        ...prevExpenseData,
+        baseExpenses: prevExpenseData.baseExpenses.filter((expense) => expense.expenseId !== expenseId),
+        total:
+          prevExpenseData.total -
+          Number(prevExpenseData.baseExpenses.find((expense) => expense.expenseId === expenseId).expenseSum),
+      }));
     } catch (err) {
       console.log(err);
       userTokenRefresh();

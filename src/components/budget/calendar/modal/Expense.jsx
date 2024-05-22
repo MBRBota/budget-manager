@@ -32,6 +32,7 @@ export default function Expense({
       </button>
       <button
         className={'overlay__delete ' + (isHovered ? 'overlay-button' : 'invisible')}
+        value={expenseId}
         onClick={handleExpenseDelete}
       >
         <i className="fa-solid fa-trash" />
