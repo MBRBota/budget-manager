@@ -18,7 +18,7 @@ export default function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await userLogin(userCredentials)
+    await userLogin(userCredentials);
 
     navigate('/statistics', { replace: true });
   };

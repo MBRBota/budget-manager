@@ -27,8 +27,12 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
   const handleExpenseSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(e.target)
-    const postData = { expenseSum: formData.get('expenseSum'), expenseDate: formData.get('expenseDate'), categoryId: formData.get('categoryId')}
+    const formData = new FormData(e.target);
+    const postData = {
+      expenseSum: formData.get('expenseSum'),
+      expenseDate: formData.get('expenseDate'),
+      categoryId: formData.get('categoryId'),
+    };
 
     try {
       const { data } = await postExpense(user.accessToken, postData);

@@ -5,7 +5,7 @@ export default function Logout() {
   const { userLogout } = useContext(UserContext);
 
   useEffect(() => {
-    userLogout()
+    userLogout();
   }, [userLogout]);
 
   return null;

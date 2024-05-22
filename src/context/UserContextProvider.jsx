@@ -6,19 +6,16 @@ export default function UserContextProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const userLogin = useCallback(
-    async (userCredentials) => {
-      try {
-        const { data } = await loginUser(userCredentials);
+  const userLogin = useCallback(async (userCredentials) => {
+    try {
+      const { data } = await loginUser(userCredentials);
 
-        setUser(data);
-      } catch (err) {
-        // todo: Implement error notification instead of redirection on login fail
-        console.log(err);
-      }
-    },
-    [],
-  );
+      setUser(data);
+    } catch (err) {
+      // todo: Implement error notification instead of redirection on login fail
+      console.log(err);
+    }
+  }, []);
 
   const userLogout = useCallback(async () => {
     try {

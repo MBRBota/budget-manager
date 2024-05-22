@@ -25,9 +25,13 @@ export default function CustomCategory({
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(e.target)
-    const patchData = { categoryId: formData.get('categoryId'), categoryName: formData.get('categoryName'), categoryColor: formData.get('categoryColor') }
-    
+    const formData = new FormData(e.target);
+    const patchData = {
+      categoryId: formData.get('categoryId'),
+      categoryName: formData.get('categoryName'),
+      categoryColor: formData.get('categoryColor'),
+    };
+
     try {
       const response = await patchCategory(user.accessToken, patchData);
 
