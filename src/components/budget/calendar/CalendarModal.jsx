@@ -1,135 +1,85 @@
 import { useContext, useState } from 'react';
+import ExpenseForm from './modal/ExpenseForm';
 import { UserContext } from '../../../context/UserContext';
-import { postCategory, postExpense } from '../../../services/resource/postResource.service';
-import CustomCategory from './modal/CustomCategory';
-import CategoryForm from './modal/CategoryForm';
+import { postExpense } from '../../../services/resource/postResource.service';
+import Expense from './modal/Expense';
 
 export default function CalendarModal({ closeModal, setShouldRefresh, date, expenses, categories }) {
-  const { user, setUser } = useContext(UserContext);
+  const { user, userTokenRefresh } = useContext(UserContext);
 
-  // Prop data to state initialization
   const [expenseData, setExpenseData] = useState(expenses);
-  const [categoryData, setCategoryData] = useState(categories);
+  const [expenseFormData, setExpenseFormData] = useState(null);
 
-  // POST form states
-  const [isAddingExpense, setIsAddingExpense] = useState(false);
-  const [isAddingCategory, setIsAddingCategory] = useState(false);
-  const [newExpense, setNewExpense] = useState({ expenseSum: '', expenseDate: date.valueOf(), categoryId: 1 });
-
-  // New resource form input handlers
-  const handleExpenseChange = (e) => {
-    const { name, value } = e.target;
-    setNewExpense((prevExpense) => ({ ...prevExpense, [name]: value }));
-  };
+  const [isAddingOrEditing, setIsAddingOrEditing] = useState(false);
 
   // New resource togglers
-  const toggleAddingExpense = () => {
-    setIsAddingExpense((prevAdding) => !prevAdding);
+  const openExpenseForm = (e) => {
+    const { expenseId, expenseSum, expenseDate, categoryId, isEdit } = e.currentTarget.dataset;
+
+    setExpenseFormData({ initialData: { expenseId, expenseSum, expenseDate, categoryId }, isEdit });
+    setIsAddingOrEditing(true);
   };
 
-  const toggleAddingCategory = () => {
-    setIsAddingCategory((prevAdding) => !prevAdding);
+  const closeExpenseForm = () => {
+    setIsAddingOrEditing(false);
   };
 
-  // New resource form submit handlers
   const handleExpenseSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await postExpense(user.accessToken, newExpense);
-
-      if (!response?.success) setUser(null);
+      const { data } = await postExpense(user.accessToken, expenseFormData);
 
       setExpenseData((prevExpenseData) => ({
         ...prevExpenseData,
-        baseExpenses: [...prevExpenseData.baseExpenses, response.data.newExpense],
-        total: prevExpenseData.total + Number(response.data.newExpense.expenseSum),
+        baseExpenses: [...prevExpenseData.baseExpenses, data.newExpense],
+        total: prevExpenseData.total + Number(data.newExpense.expenseSum),
       }));
 
-      setIsAddingExpense(false);
+      closeExpenseForm();
       setShouldRefresh(true);
     } catch (err) {
       console.log(err);
-      setUser(null);
+      userTokenRefresh();
     }
   };
 
-  const handleCategorySubmit = async (e) => {
+  const handleExpenseDelete = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData(e.target)
-    const postData = { categoryName: formData.get('categoryName'), categoryColor: formData.get('categoryColor') }
-
     try {
-      const response = await postCategory(user.accessToken, postData);
-
-      setCategoryData((prevCategoryData) => [...prevCategoryData, response.data.newCategory]);
-
-      setIsAddingCategory(false);
-      setShouldRefresh(true);
+      //todo
     } catch (err) {
       console.log(err);
-      setUser(null);
+      userTokenRefresh();
     }
   };
 
-  const onCategoryEdit = (updatedCategory) => {
-    setCategoryData((prevCategoryData) =>
-      prevCategoryData.map((category) => {
-        return category.categoryId === updatedCategory.categoryId ? updatedCategory : category;
-      }),
-    );
+  const handleExpenseEdit = (e) => {
+    e.preventDefault();
 
-    setShouldRefresh(true);
+    try {
+      //todo
+    } catch (err) {
+      console.log(err);
+      userTokenRefresh();
+    }
   };
 
-  const onCategoryDelete = (deletedId) => {
-    setCategoryData((prevCategoryData) => prevCategoryData.filter((category) => category.categoryId !== deletedId));
-
-    setShouldRefresh(true);
-  };
-
-  const baseExpenses = expenseData.baseExpenses.map((expense, idx) => (
-    <li key={idx} className="modal-expense">
-      <h3>
-        <i className="fa-solid fa-circle" style={{ color: '#' + expense.categoryColor }} />
-        {Number(expense.expenseSum)} RON - {expense.categoryName}
-      </h3>
-    </li>
-  ));
-
-  const categoryMapper = (categoryList, isCustom = false) =>
-    categoryList.map((category) =>
-      isCustom ? (
-        <CustomCategory
-          key={category.categoryId}
-          categoryId={category.categoryId}
-          categoryName={category.categoryName}
-          categoryColor={category.categoryColor}
-          selectedId={Number(newExpense.categoryId)}
-          handleExpenseChange={handleExpenseChange}
-          onCategoryDelete={onCategoryDelete}
-          onCategoryEdit={onCategoryEdit}
-        />
-      ) : (
-        <li key={category.categoryId} className="category__container">
-          <button
-            className={`category ${Number(newExpense.categoryId) === category.categoryId ? 'active' : ''}`}
-            name="categoryId"
-            value={category.categoryId}
-            onClick={handleExpenseChange}
-          >
-            <i className="fa-solid fa-circle" style={{ color: '#' + category.categoryColor }} />
-            {category.categoryName}
-          </button>
-        </li>
-      ),
-    );
-
-  const defaultCategories = categoryMapper(categoryData.filter((category) => category.categoryId <= 8));
-  const customCategories = categoryMapper(
-    categoryData.filter((category) => category.categoryId > 8),
-    true,
+  const baseExpenses = expenseData.baseExpenses.map(
+    ({ expenseId, expenseSum, expenseDate, categoryId, categoryName, categoryColor }) => (
+      <Expense
+        key={expenseId}
+        expenseId={expenseId}
+        expenseSum={Number(expenseSum)}
+        expenseDate={expenseDate}
+        categoryId={categoryId}
+        categoryName={categoryName}
+        categoryColor={categoryColor}
+        openExpenseForm={openExpenseForm}
+        handleExpenseDelete={handleExpenseDelete}
+      />
+    ),
   );
 
   return (
@@ -138,57 +88,25 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
         <h3 className="header__date">{date.format('D MMMM YYYY')}</h3>
         <h1 className="header__total">Total spent: {expenseData.total} RON</h1>
       </div>
-      {isAddingExpense ? (
-        <>
-          <form className="expense-form" onSubmit={handleExpenseSubmit}>
-            <button type="button" onClick={toggleAddingExpense}>
-              <i className="fa-solid fa-square-caret-left" />
-            </button>
-            <input
-              type="number"
-              name="expenseSum"
-              value={newExpense.expenseSum}
-              min="1"
-              onChange={handleExpenseChange}
-              placeholder="Enter sum"
-              required
-            />
-            <input type="hidden" name="expenseDate" value={newExpense.expenseDate} required />
-            <input type="hidden" name="categoryId" value={newExpense.categoryId} required />
-            <button className="expense-form__submit" type="submit">
-              <i className="fa-solid fa-floppy-disk" />
-            </button>
-          </form>
-          <div className="modal-category__container">
-            <h2 className="category__header">Default Categories</h2>
-            <ul className="category-default__container">{defaultCategories}</ul>
-            <h2 className="category__header">Custom Categories</h2>
-            {customCategories.length === 0 && (
-              <p className="category__notice">No custom categories. You can add a custom category below.</p>
-            )}
-            <ul className="category-custom__container">
-              {customCategories}
-              <li>
-                {isAddingCategory ? (
-                  <CategoryForm 
-                    initialData={{ categoryName: '', categoryColor: '' }}
-                    isEdit={false}
-                    onSubmit={handleCategorySubmit}
-                    toggleForm={toggleAddingCategory}
-                  />
-                ) : (
-                  <button className="category__add" onClick={toggleAddingCategory}>
-                    <i className="fa-regular fa-square-plus" />
-                  </button>
-                )}
-              </li>
-            </ul>
-          </div>
-        </>
+      {isAddingOrEditing ? (
+        <ExpenseForm
+          categories={categories}
+          initialData={expenseFormData.initialData}
+          isEdit={expenseFormData.isEdit}
+          onSubmit={expenseFormData.isEdit ? handleExpenseEdit : handleExpenseSubmit}
+          setShouldRefresh={setShouldRefresh}
+          closeExpenseForm={closeExpenseForm}
+        />
       ) : (
         <>
           <ul className="modal-expense__container">{baseExpenses}</ul>
-          <button className="modal-expense__add" onClick={toggleAddingExpense}>
+          <button
+            className="modal-expense__add"
+            onClick={openExpenseForm}
+            data-expense-sum=""
+            data-expense-date={date.valueOf()}
+            data-category-id="1"
+          >
             + Add Expense
           </button>
         </>
