@@ -1,6 +1,5 @@
 import { resourceApi } from '../../utils/axios';
 import { APP_CONSTANTS } from '../../utils/constants';
-import { retryWithRefresh } from './retryWithRefresh.service';
 
 export const patchCategory = async (accessToken, categoryData) => {
   const { data } = await resourceApi.patch(
@@ -9,8 +8,6 @@ export const patchCategory = async (accessToken, categoryData) => {
     { category: categoryData },
     { headers: { Authorization: `Bearer ${accessToken}` } },
   );
-
-  if (!data?.success) return await retryWithRefresh((newToken) => patchCategory(newToken, categoryData));
 
   return data;
 };

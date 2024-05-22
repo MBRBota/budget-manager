@@ -1,6 +1,5 @@
 import { resourceApi } from '../../utils/axios';
 import { APP_CONSTANTS } from '../../utils/constants';
-import { retryWithRefresh } from './retryWithRefresh.service';
 
 export const postExpense = async (accessToken, expenseData) => {
   const { data } = await resourceApi.post(
@@ -9,8 +8,6 @@ export const postExpense = async (accessToken, expenseData) => {
     { expense: expenseData },
     { headers: { Authorization: `Bearer ${accessToken}` } },
   );
-
-  if (!data?.success) return await retryWithRefresh((newToken) => postExpense(newToken, expenseData));
 
   return data;
 };
@@ -22,8 +19,6 @@ export const postCategory = async (accessToken, categoryData) => {
     { category: categoryData },
     { headers: { Authorization: `Bearer ${accessToken}` } },
   );
-
-  if (!data?.success) return await retryWithRefresh((newToken) => postCategory(newToken, categoryData));
 
   return data;
 };
