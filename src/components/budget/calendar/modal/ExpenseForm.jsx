@@ -4,7 +4,7 @@ import CustomCategory from './CustomCategory';
 import CategoryForm from './CategoryForm';
 import { postCategory } from '../../../../services/resource/postResource.service';
 
-export default function ExpenseForm({ categories, initialData, isEdit, onSubmit, setShouldRefresh, closeExpenseForm }) {
+export default function ExpenseForm({ categories, initialData, categoryName, isEdit, onSubmit, setShouldRefresh, closeExpenseForm }) {
   const { user, userTokenRefresh } = useContext(UserContext);
 
   const [categoryData, setCategoryData] = useState(categories);
@@ -92,6 +92,7 @@ export default function ExpenseForm({ categories, initialData, isEdit, onSubmit,
 
   return (
     <>
+      {isEdit && <p><strong>Modifying Expense: </strong>{initialData.expenseSum} RON - {categoryName}</p>}
       <form className="expense-form" onSubmit={onSubmit}>
         <button type="button" onClick={closeExpenseForm}>
           <i className="fa-solid fa-square-caret-left" />

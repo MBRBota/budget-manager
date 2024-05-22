@@ -25,6 +25,7 @@ export default function Expense({
         data-expense-sum={expenseSum}
         data-expense-date={expenseDate}
         data-category-id={categoryId}
+        data-category-name={categoryName}
         data-is-edit
       >
         <i className="fa-solid fa-pencil" />

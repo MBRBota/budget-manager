@@ -14,9 +14,9 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
 
   // New resource togglers
   const openExpenseForm = (e) => {
-    const { expenseId, expenseSum, expenseDate, categoryId, isEdit } = e.currentTarget.dataset;
+    const { expenseId, expenseSum, expenseDate, categoryId, categoryName, isEdit } = e.currentTarget.dataset;
 
-    setExpenseFormData({ initialData: { expenseId, expenseSum, expenseDate, categoryId }, isEdit });
+    setExpenseFormData({ initialData: { expenseId, expenseSum, expenseDate, categoryId }, categoryName, isEdit });
     setIsAddingOrEditing(true);
   };
 
@@ -95,6 +95,7 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
         <ExpenseForm
           categories={categories}
           initialData={expenseFormData.initialData}
+          categoryName={expenseFormData.categoryName}
           isEdit={expenseFormData.isEdit}
           onSubmit={expenseFormData.isEdit ? handleExpenseEdit : handleExpenseSubmit}
           setShouldRefresh={setShouldRefresh}
