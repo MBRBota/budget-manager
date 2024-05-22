@@ -60,13 +60,59 @@
 
   .modal-expense__container {
     margin-top: 2rem;
+    padding: 0;
     list-style: none;
 
-    .modal-expense i {
-      font-size: 1rem;
-      margin-right: 1rem;
-      vertical-align: middle;
+    .modal-expense {
+      position: relative;
+      width: fit-content;
+      padding: 0 4rem;
+
+      h3 {
+        display: flex;
+        align-items: center;
+
+        i {
+          font-size: 1rem;
+          margin-right: 1rem;
+        }
+      }
+
     }
+
+  }
+
+  .overlay-button, .invisible {
+    position: absolute;
+    top: 0;
+    transition: opacity 0.25s;
+    padding: 0;
+    height: 100%;
+    width: 4rem;
+    background: none;
+    border: none;
+  }
+
+  .invisible {
+    opacity: 0;
+  }
+
+  .overlay__edit {
+    left: 0;
+  }
+
+  .overlay__edit:hover {
+    color: #7272db;
+    transition: color 0.25s;
+  }
+
+  .overlay__delete {
+    right: 0px;
+  }
+
+  .overlay__delete:hover {
+    color: #ad2d2d;
+    transition: color 0.25s;
   }
 
   .modal-expense__add {
@@ -116,39 +162,6 @@
 
         .category.active {
           border-color: white;
-        }
-
-        .overlay-button, .invisible {
-          position: absolute;
-          top: 0;
-          transition: opacity 0.25s;
-          padding: 0;
-          height: 100%;
-          width: 4rem;
-          background: none;
-          border: none;
-        }
-  
-        .invisible {
-          opacity: 0;
-        }
-
-        .overlay__edit {
-          left: 0;
-        }
-
-        .overlay__edit:hover {
-          color: #7272db;
-          transition: color 0.25s;
-        }
-
-        .overlay__delete {
-          right: 0px;
-        }
-
-        .overlay__delete:hover {
-          color: #ad2d2d;
-          transition: color 0.25s;
         }
       }
     }
