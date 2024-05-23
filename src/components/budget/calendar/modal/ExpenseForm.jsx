@@ -10,12 +10,14 @@ export default function ExpenseForm({
   categoryName,
   isEdit,
   onSubmit,
+  onCategorySubmit,
+  onCategoryEdit,
+  onCategoryDelete,
   setShouldRefresh,
   closeExpenseForm,
 }) {
   const { user, userTokenRefresh } = useContext(UserContext);
 
-  const [categoryData, setCategoryData] = useState(categories);
   const [expenseFormData, setExpenseFormData] = useState(initialData);
 
   const [isAddingCategory, setIsAddingCategory] = useState(false);
@@ -38,7 +40,7 @@ export default function ExpenseForm({
     try {
       const { data } = await postCategory(user.accessToken, postData);
 
-      setCategoryData((prevCategoryData) => [...prevCategoryData, data.newCategory]);
+      onCategorySubmit(data.newCategory)
 
       setIsAddingCategory(false);
       setShouldRefresh(true);
@@ -46,22 +48,6 @@ export default function ExpenseForm({
       console.log(err);
       userTokenRefresh();
     }
-  };
-
-  const onCategoryEdit = (updatedCategory) => {
-    setCategoryData((prevCategoryData) =>
-      prevCategoryData.map((category) => {
-        return category.categoryId === updatedCategory.categoryId ? updatedCategory : category;
-      }),
-    );
-
-    setShouldRefresh(true);
-  };
-
-  const onCategoryDelete = (deletedId) => {
-    setCategoryData((prevCategoryData) => prevCategoryData.filter((category) => category.categoryId !== deletedId));
-
-    setShouldRefresh(true);
   };
 
   const categoryMapper = (categoryList, isCustom = false) =>
@@ -92,9 +78,9 @@ export default function ExpenseForm({
       ),
     );
 
-  const defaultCategories = categoryMapper(categoryData.filter((category) => category.categoryId <= 8));
+  const defaultCategories = categoryMapper(categories.filter((category) => category.categoryId <= 8));
   const customCategories = categoryMapper(
-    categoryData.filter((category) => category.categoryId > 8),
+    categories.filter((category) => category.categoryId > 8),
     true,
   );
 

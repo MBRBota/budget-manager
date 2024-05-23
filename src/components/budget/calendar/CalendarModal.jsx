@@ -10,11 +10,11 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
   const { user, userTokenRefresh } = useContext(UserContext);
 
   const [expenseData, setExpenseData] = useState(expenses);
-  const [expenseFormData, setExpenseFormData] = useState(null);
+  const [categoryData, setCategoryData] = useState(categories);
 
+  const [expenseFormData, setExpenseFormData] = useState(null);
   const [isAddingOrEditing, setIsAddingOrEditing] = useState(false);
 
-  // New resource togglers
   const openExpenseForm = (e) => {
     const { expenseId, expenseSum, expenseDate, categoryId, categoryName, isEdit } = e.currentTarget.dataset;
 
@@ -111,6 +111,31 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
     }
   };
 
+  const onCategorySubmit = (newCategory) => {
+    
+    setCategoryData((prevCategoryData) => [...prevCategoryData, newCategory]);
+
+    setShouldRefresh(true);
+  }
+
+  const onCategoryEdit = (updatedCategory) => {
+
+    setCategoryData((prevCategoryData) =>
+      prevCategoryData.map((category) => {
+        return category.categoryId === updatedCategory.categoryId ? updatedCategory : category;
+      }),
+    );
+
+    setShouldRefresh(true);
+  };
+
+  const onCategoryDelete = (deletedId) => {
+
+    setCategoryData((prevCategoryData) => prevCategoryData.filter((category) => category.categoryId !== deletedId));
+
+    setShouldRefresh(true);
+  };
+
   const baseExpenses = expenseData.baseExpenses.map(
     ({ expenseId, expenseSum, expenseDate, categoryId, categoryName, categoryColor }) => (
       <Expense
@@ -135,11 +160,15 @@ export default function CalendarModal({ closeModal, setShouldRefresh, date, expe
       </div>
       {isAddingOrEditing ? (
         <ExpenseForm
-          categories={categories}
+          key={categoryData}
+          categories={categoryData}
           initialData={expenseFormData.initialData}
           categoryName={expenseFormData.categoryName}
           isEdit={expenseFormData.isEdit}
           onSubmit={expenseFormData.isEdit ? handleExpenseEdit : handleExpenseSubmit}
+          onCategorySubmit={onCategorySubmit}
+          onCategoryEdit={onCategoryEdit}
+          onCategoryDelete={onCategoryDelete}
           setShouldRefresh={setShouldRefresh}
           closeExpenseForm={closeExpenseForm}
         />
