@@ -13,7 +13,7 @@ export default function CustomCategory({
   onCategoryEdit,
   onCategoryDelete,
 }) {
-  const { user, setUser } = useContext(UserContext);
+  const { user, userTokenRefresh } = useContext(UserContext);
 
   const [isHovered, setIsHovered] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -42,7 +42,7 @@ export default function CustomCategory({
       setIsEditing(false);
     } catch (err) {
       console.log(err);
-      setUser(null);
+      userTokenRefresh();
     }
   };
 
@@ -55,7 +55,7 @@ export default function CustomCategory({
       setIsEditing(false);
     } catch (err) {
       console.log(err);
-      setUser(null);
+      userTokenRefresh();
     }
   };
 
