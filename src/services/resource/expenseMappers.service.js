@@ -75,6 +75,21 @@ const getFilteredByRangeExpenses = (userExpenses, date, timeUnit, timeValue, req
   });
 };
 
+// TODO: Convert expense values to number on fetch
+ const getSumOfExpenses = (expenses, sumProperty, constantProperty, constantValue) => {
+   return expenses.reduce(
+      (accumulator, currentExpense) => ({
+        [sumProperty]: accumulator[sumProperty] + Number(currentExpense[sumProperty]),
+        [constantProperty]: accumulator[constantProperty] || currentExpense[constantProperty],
+      }),
+      // Initial value in case of empty array
+      {
+        [sumProperty]: 0,
+        [constantProperty]: constantValue,
+      },
+    );
+ }
+
 // Returns an array of expenses within the provided date's time unit
 export const mapExpenseTotalsLinearly = (options) => {
   const { userExpenses, date, timeUnit, requireSubUnit, constantProperty, sumProperty } = options;
@@ -92,17 +107,7 @@ export const mapExpenseTotalsLinearly = (options) => {
   for (let i = startOfUnit; i <= endOfUnit; i++) {
     const filterByRange = getFilteredByRangeExpenses(userExpenses, date, timeUnit, i, requireSubUnit);
 
-    const sumExpenses = filterByRange.reduce(
-      (accumulator, currentExpense) => ({
-        [constantProperty]: accumulator[constantProperty],
-        [sumProperty]: accumulator[sumProperty] + Number(currentExpense.expenseSum),
-      }),
-      // Initial value in case of empty array
-      {
-        [constantProperty]: getDefaultOfUnit(date, timeUnit, i),
-        [sumProperty]: 0,
-      },
-    );
+    const sumExpenses = getSumOfExpenses(filterByRange, sumProperty, constantProperty, getDefaultOfUnit(date, timeUnit, i))
 
     sumExpenses.baseExpenses = filterByRange;
 
@@ -123,20 +128,11 @@ export const mapExpenseTotalsByCategory = (userExpenses, date, timeUnit) => {
   // Ensure each label has a value and color at a similar position in their respective arrays
   for (const label of categoryLabels) {
     const filterByCategory = filterByRange.filter(({ categoryName }) => categoryName === label);
+    
+    const sumExpenses = getSumOfExpenses(filterByCategory, 'expenseSum', 'categoryColor');
 
-    const sumExpenses = filterByCategory.reduce(
-      (accumulator, currentExpense) => ({
-        sum: accumulator.sum + Number(currentExpense.expenseSum),
-        color: currentExpense.categoryColor,
-      }),
-      {
-        sum: 0,
-        color: '7A797B',
-      },
-    );
-
-    categoryTotals.push(sumExpenses.sum);
-    categoryColors.push('#' + sumExpenses.color);
+    categoryTotals.push(sumExpenses.expenseSum);
+    categoryColors.push('#' + sumExpenses.categoryColor);
   }
 
   return [categoryLabels, categoryColors, categoryTotals];
